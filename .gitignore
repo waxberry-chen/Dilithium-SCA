@@ -5,17 +5,27 @@ data
 vsrc/work/bin
 vsrc/work/logs
 vsrc/work/waves
-
 scripts/env_setting/env
 
-##### FILE TYPE #####
-
+#####################
+#     FILE TYPE     #
+#####################
+# ignore all content
+csrc/**
+# save dirs
+!csrc/**/
+!csrc/**/*.c
+!csrc/**/*.h
+!csrc/**/*.cpp
 *.txt
 
-
-##### TOOL CACHE #####
+######################
+#     TOOL CACHE     #
+######################
 **/verdiLog
 **/novas*.*
 **/ucli.key
 
-### SPECIAL SETTING ###
+###########################
+#     SPECIAL SETTING     #
+###########################
