@@ -7,16 +7,17 @@ import os
  This file is used to get cpa result form averaged data / source data.
 """
 special_b = 2773
-DIR_TAG = '_kyber'
-DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}/averaged/"
+DIR_TAG = '_kyber_q3329'
+DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}{DIR_TAG}/averaged/"
 
 ### file path
 # DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}/averaged/"
 # TAG = ""
 # TRACE_FILE_NAME = "averaged_mau_loop20.txt"
 # TAG = "align/"
-TAG = "old_cym_scripts-3329/"
-TRACE_FILE_NAME = "averaged-0to19.txt"
+TAG = "align/"
+bak = 'mm_o'
+TRACE_FILE_NAME = "averaged_mau_loop20.txt"
 # TRACE_FILE_NAME = "averaged_mau_loop20.txt"
 
 #RANDOM_FILE = "/15T/Projects/Dilithium-SCA/data/special_files/Random_3000.txt"
@@ -40,6 +41,8 @@ LOW_SAMPLE = 0
 HIGH_SAMPLE = 5000
 SAMPLE_NUM_RESULT = HIGH_SAMPLE - LOW_SAMPLE
 
+DOWNSAMPLE_FACTOR = 1
+
 
 
 ### instance
@@ -57,9 +60,9 @@ cpa = CPA(
 
 if __name__ == "__main__":
     timestamp = datetime.now().strftime("%Y%m%d_%H:%M")
-    bak = ''
+    
     time_tag = timestamp+'-'+TAG[:-1]+bak
-    cpa.read_power()
+    cpa.read_power(down_sample_factor = DOWNSAMPLE_FACTOR )
     result = cpa.analyze()
     draw = Draw(
         picture_save_path=PICTURE_PATH,

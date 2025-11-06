@@ -236,7 +236,7 @@ if __name__ == "__main__":
         print("--- 开始功耗迹线预处理 ---")
         
         timestamp = datetime.now().strftime("%Y%m%d_%H.%M")
-        result_dir = f"/15T/Projects/Dilithium-SCA/data/traces/{A_VAL_TO_VISUALIZE}/averaged/old_cym_scripts-3329/"
+        result_dir = f"/15T/Projects/Dilithium-SCA/data/traces/{A_VAL_TO_VISUALIZE}_kyber/averaged/old_process/"
         os.makedirs(result_dir, exist_ok=True)
         print(f"本次运行结果将保存在: {result_dir}")
 

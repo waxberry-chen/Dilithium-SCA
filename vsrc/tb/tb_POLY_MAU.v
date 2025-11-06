@@ -1,9 +1,9 @@
 `timescale 1ns/100ps
 
 `define PWM     4'b0100
-`define qNUM    24'd8380417
-`define mNUM    25'd8396807
-`define nNUM    5'd23
+`define qNUM    24'd3329  // -> 3329
+`define mNUM    25'd5039  // -> 2^24 / 3329
+`define nNUM    5'd12        // -> 12
 
 `define FINISH_TIME  8400000
 
@@ -30,9 +30,9 @@ wire poly_valid;
 wire [23:0] poly_mau_o0;
 wire [23:0] poly_mau_o1;
 
-assign poly_kd_sel = 1'b1;//Dilithium
+assign poly_kd_sel = 1'b1;//Dilithium -> 3bits
 assign poly_duv_mode = 2'b00;
-assign poly_alu_mode = `PWM;
+assign poly_alu_mode = `PWM;  //
 assign poly_compress = 2'b00;
 assign poly_decompose = 2'b00;
 
@@ -42,42 +42,79 @@ assign poly_q = `qNUM;
 assign poly_barret_m = `mNUM;
 assign poly_mm_N = `nNUM;
 
-// 时钟产生
-initial clk = 0;
-always #5 clk = ~clk; // 100MHz 时钟
-always begin
-  #95 poly_enable = 0;
-  #105 poly_enable = 1 ;
-end
+parameter CLK_PERIOD = 10;
+// *************** INIT *************** 
 
+
+
+
+// initial begin
+//     $fsdbDumpfile("waves/wave.fsdb");
+//     $fsdbDumpvars(0, tb_POLY_MAU);
+//     rst_n = 0 ;
+//     poly_enable = 0;
+//     #10 rst_n = 1 ;
+//     poly_enable = 1 ;
+//     #`FINISH_TIME;
+//     $finish;
+
+// end
+
+// always @(posedge clk or negedge rst_n)begin
+// if(~rst_n)begin
+//   poly_mau_a <= 24'd0;
+//   poly_mau_b <= 24'd2773;
+// end
+// else begin
+//   if(poly_enable)begin
+//     if(poly_mau_a<poly_q)begin
+//       poly_mau_a <= poly_mau_a + 1'b1;
+//     end else begin
+//       poly_mau_a <= 24'd0;
+//       poly_mau_b <= poly_mau_b + 1'b1;
+//     end
+//   end
+// end
+// end
+parameter DATA_WIDTH = 24;
+parameter NUM_INPUTS = 6;
+
+task pipeline_input;
+  input [DATA_WIDTH-1:0] data_a [NUM_INPUTS-1:0];
+  integer i;
+  begin
+    for (i = 0; i < NUM_INPUTS; i = i + 1) begin
+        @(posedge clk);
+        poly_mau_a <= data_a[i];
+      end
+  end
+endtask
+
+always #((CLK_PERIOD)/2) clk = ~clk; // 100MHz 时钟
+
+reg [DATA_WIDTH-1:0] test_data [NUM_INPUTS-1:0];
 
 initial begin
-    $fsdbDumpfile("waves/wave.fsdb");
-    $fsdbDumpvars(0, tb_POLY_MAU);
-    rst_n = 0 ;
-    poly_enable = 0;
-    #10 rst_n = 1 ;
-    poly_enable = 1 ;
-    #`FINISH_TIME;
-    $finish;
+  $fsdbDumpfile("waves/tb_POLY_MAU.fsdb");
+  $fsdbDumpvars(0, tb_POLY_MAU);
+  clk = 0;
+  poly_enable = 0;
+  #(CLK_PERIOD * 10);
+  poly_enable = 1;
+  poly_mau_b = 24'd2773;
+  #(CLK_PERIOD * 5);
 
-end
+  test_data[0] = 24'd1;
+  test_data[1] = 24'd2;
+  test_data[2] = 24'd3;
+  test_data[3] = 24'd4;
+  test_data[4] = 24'd5;
+  test_data[5] = 24'd6;
 
-always @(posedge clk or negedge rst_n)begin
-if(~rst_n)begin
-  poly_mau_a <= 24'd0;
-  poly_mau_b <= 24'd2773;
-end
-else begin
-  if(poly_enable)begin
-    if(poly_mau_a<poly_q)begin
-      poly_mau_a <= poly_mau_a + 1'b1;
-    end else begin
-      poly_mau_a <= 24'd0;
-      poly_mau_b <= poly_mau_b + 1'b1;
-    end
-  end
-end
+  pipeline_input(test_data);
+
+  #(CLK_PERIOD * 20);
+  $finish;
 end
 
 
@@ -85,7 +122,7 @@ POLY_MAU u_POLY_MAU(
   .clk(clk),
   .rst_n(rst_n),
   .poly_kd_sel(poly_kd_sel),//0:kyber  1:dilithium
-  .poly_pwm2_odd_even_sel(poly_pwm2_odd_even_sel), // for lyber PWM2
+  .poly_pwm2_odd_even_sel(poly_pwm2_odd_even_sel), // for kyber PWM2
   .poly_duv_mode(poly_duv_mode),//00:du=10 01:du=11 10:dv=4 11:dv=5
   .poly_alu_mode(poly_alu_mode),
   .poly_compress(poly_compress), //00:no compress 01:compress 11:decompress

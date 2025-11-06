@@ -62,7 +62,7 @@ def column_pearson_corr(matrix1, matrix2):
 ### get distance in cycle 7
 
 a_last = 0
-qNUM = 8380417
+qNUM = 3329
 
 ########################################
 #     Get Prediction Vector Method     #
@@ -79,7 +79,7 @@ def distance(plaintexts,key):
     mm_result = HD(plaintexts[0]*key%qNUM,plaintexts[1]*key%qNUM)
     output = HD(a_last*key%qNUM,plaintexts[0]*key%qNUM)
     a_last = plaintexts[5]
-    return output 
+    return output  + mm_result
 
     # ##### Verify #####
     # wn = 1729
@@ -124,7 +124,7 @@ def get_plaintexts(file_path,trace_number,plaintext_num=6):
         plaintexts.append(int(line)) 
     return plaintexts  
 
-DOWNSAMPLE_FACTOR = 20      # 降采样参数
+     # 降采样参数
 class CPA:
     def __init__(self, power_trace_file, random_plaintext_file,
                  sample_number=5000, traces_number=3329, key_number=3329,
@@ -155,7 +155,7 @@ class CPA:
         self.plaintext_list = []
         self.power_trace_mat = None
         
-    def read_power(self):
+    def read_power(self,down_sample_factor=1):
         """读取功耗轨迹数据"""
         self.power_trace_mat = np.zeros((self.traces_number, self.sample_number))
         # 进度条
@@ -186,10 +186,10 @@ class CPA:
         print(f"INFO: 1. Successfully read {len(self.plaintext_list)} power traces")
         print(f"INFO: 2. Power traces matrix size: ({self.power_trace_mat.shape[0]} x {self.power_trace_mat.shape[1]})")
         ##### DownSample #####
-        if DOWNSAMPLE_FACTOR > 1:
+        if down_sample_factor > 1:
             print(f"\tINFO: Down Sampling activated, processing...")
-            sample_downsize = self.power_trace_mat.shape[1] // DOWNSAMPLE_FACTOR
-            self.power_trace_mat = self.power_trace_mat[:, :sample_downsize * DOWNSAMPLE_FACTOR].reshape(self.power_trace_mat.shape[0], sample_downsize, DOWNSAMPLE_FACTOR).max(axis=2)
+            sample_downsize = self.power_trace_mat.shape[1] // down_sample_factor
+            self.power_trace_mat = self.power_trace_mat[:, :sample_downsize * down_sample_factor].reshape(self.power_trace_mat.shape[0], sample_downsize, down_sample_factor).max(axis=2)
             self.sample_number = sample_downsize
             print(f"\tINFO: Resize into ({self.power_trace_mat.shape[0]} x {sample_downsize})")
 

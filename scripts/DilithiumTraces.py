@@ -11,7 +11,7 @@ SOURCE_FILE_PREFIX_NAME = 'mau_traces-loop'
 
 KEY_NUM = 2773
 FILE_NUM =20
-DIR_TAG = '_kyber'
+DIR_TAG = '_kyber_q3329'
 
 SAMPLE_NUM = 5000
 PLAINTEXT_NUM = 2994

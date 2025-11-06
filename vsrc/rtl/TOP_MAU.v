@@ -1,7 +1,12 @@
+// `define PWM     4'b0100
+// `define qNUM    24'd8380417
+// `define mNUM    25'd8396807
+// `define nNUM    5'd23
+
 `define PWM     4'b0100
-`define qNUM    24'd8380417
-`define mNUM    25'd8396807
-`define nNUM    5'd23
+`define qNUM    24'd3329  // -> 3329
+`define mNUM    25'd5039  // -> 2^24 / 3329
+`define nNUM    5'd12        // -> 12
 
 
 module TOP_MAU(clk,rst_n,a,b,enable);
@@ -75,5 +80,30 @@ POLY_MAU u_POLY_MAU(
   .poly_mau_o1(poly_mau_o1)
 
 );
+
+
+// ***** new *****
+
+// POLY_MAU u_POLY_MAU(
+//     .clk            ( clk            ),
+//     .rst_n          ( rst_n          ),
+// 	.algorithm_sel  ( algorithm_sel  ),    
+// 	.poly_pwm2_odd_even_sel ( poly_pwm2_odd_even_sel ),
+//     .poly_duv_mode  ( poly_duv_mode  ),
+//     .poly_alu_mode  ( poly_alu_mode  ),
+//     .poly_compress  ( poly_compress  ),
+//     .poly_decompose ( poly_decompose ),
+//     .poly_mau_a     ( poly_mau_a     ),
+//     .poly_mau_b     ( poly_mau_b     ),
+//     .poly_mau_c     ( poly_mau_c     ),
+//     .poly_mau_d     ( poly_mau_d     ),
+//     .poly_q         ( poly_q         ),
+//     .poly_barret_m  ( poly_barret_m  ),
+//     .poly_mm_N      ( poly_mm_N      ),
+//     .poly_enable    ( poly_enable    ),
+//     // .poly_valid     ( poly_valid     ),
+//     .poly_mau_o0    ( poly_mau_o0    ),
+//     .poly_mau_o1    ( poly_mau_o1    )
+// );
 
 endmodule

@@ -8,9 +8,10 @@
 ########################
 #      Module Name     #
 ########################
-MODULE := chip_sasebo_giii_poly
+# MODULE := POLY_MAU
 # MODULE := lbus_if
-# SUBMODULES := round table
+# MODULE := chip_sasebo_giii_poly
+MODULE := test_power
 
 #########################
 #     Path & Source     #
@@ -27,7 +28,9 @@ WAVE_DIR := $(WORK_DIR)/waves
 #    SRCS    #
 ##############
 TOP_SRCS := $(wildcard $(RTL_DIR)/$(MODULE).v)
+
 RTL_SRCS := $(wildcard $(RTL_DIR)/*.v)
+
 TB_SRCS_CPP := $(wildcard $(TB_DIR)/tb_$(MODULE).cpp)
 TB_SRCS_V := $(wildcard $(TB_DIR)/tb_$(MODULE).v)
 #$(info MODULE = $(MODULE))
@@ -71,7 +74,6 @@ clean:
 	rm -rf \
 		.stamp.* \
 		./obj_dir \
-		$(WAVE_DIR) \
 		$(BIN_DIR) \
 		$(LOG_DIR) \
 		ucli.key \
