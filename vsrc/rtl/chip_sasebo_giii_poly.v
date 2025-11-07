@@ -133,18 +133,17 @@ module CHIP_SASEBO_GIII_POLY
       if (~rst_n) begin
          working_flag <= 1'b0;
          working_cycle_cnt <= 3'd0;
-
       end else begin
-
          if(start)begin
             working_flag <= 1'b1;
-         end
-
-         if(working_flag&(working_cycle_cnt<`WORKING_CYCLE_NUM-1'b1)) begin
-            working_cycle_cnt <= working_cycle_cnt + 1'b1;
-         end else if(working_flag &(working_cycle_cnt>=`WORKING_CYCLE_NUM-1'b1)) begin
-            working_flag <= 1'b0;
-            working_cycle_cnt <= 3'd0;
+            working_cycle_cnt <= 3'b0;
+         end else if (working_flag) begin 
+            if(working_cycle_cnt<`WORKING_CYCLE_NUM-1'b1) begin
+               working_cycle_cnt <= working_cycle_cnt + 1'b1;
+            end else begin
+               working_flag <= 1'b0;
+               working_cycle_cnt <= 3'd0;
+            end
          end
       end
    end
@@ -168,7 +167,6 @@ module CHIP_SASEBO_GIII_POLY
 endmodule 
 
 
-   
 //================================================ MK_CLKRST
 module MK_CLKRST (clkin, rstnin, clk, rst);
    //synthesis attribute keep_hierarchy of MK_CLKRST is no;

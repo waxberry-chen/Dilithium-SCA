@@ -7,18 +7,21 @@ import os
  This file is used to get cpa result form averaged data / source data.
 """
 special_b = 2773
-DIR_TAG = '_kyber_q3329'
+# DIR_TAG = '_kyber_q3329'
+DIR_TAG = '_kyber_mm_loop7'
 DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}{DIR_TAG}/averaged/"
+# DATA_ROOT = "/15T/Projects/Dilithium-SCA/data/traces/"
+# TRACE_FILE_NAME = "mau_traces-loop0.txt"
+TRACE_FILE_NAME = "averaged_mau_loop2.txt"
+# TRACE_FILE_NAME = "averaged_mau_loop20.txt"
+
 
 ### file path
-# DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}/averaged/"
 # TAG = ""
-# TRACE_FILE_NAME = "averaged_mau_loop20.txt"
-# TAG = "align/"
 TAG = "align/"
-bak = 'mm_o'
-TRACE_FILE_NAME = "averaged_mau_loop20.txt"
-# TRACE_FILE_NAME = "averaged_mau_loop20.txt"
+# TAG = "2773_kyber_mm_loop7/"
+bak = '-output-p0'
+
 
 #RANDOM_FILE = "/15T/Projects/Dilithium-SCA/data/special_files/Random_3000.txt"
 RANDOM_FILE = "/15T/Projects/Dilithium-SCA/data/special_files/random_3000_0-3328.txt"
@@ -41,7 +44,7 @@ LOW_SAMPLE = 0
 HIGH_SAMPLE = 5000
 SAMPLE_NUM_RESULT = HIGH_SAMPLE - LOW_SAMPLE
 
-DOWNSAMPLE_FACTOR = 1
+DOWNSAMPLE_FACTOR = 20
 
 
 
@@ -61,9 +64,12 @@ cpa = CPA(
 if __name__ == "__main__":
     timestamp = datetime.now().strftime("%Y%m%d_%H:%M")
     
-    time_tag = timestamp+'-'+TAG[:-1]+bak
+    time_tag = timestamp+'-'+DIR_TAG+'-'+TAG[:-1]+bak
+    
     cpa.read_power(down_sample_factor = DOWNSAMPLE_FACTOR )
+
     result = cpa.analyze()
+
     draw = Draw(
         picture_save_path=PICTURE_PATH,
         key_number=KEY_NUM,

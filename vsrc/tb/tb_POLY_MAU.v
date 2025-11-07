@@ -85,8 +85,12 @@ task pipeline_input;
   begin
     for (i = 0; i < NUM_INPUTS; i = i + 1) begin
         @(posedge clk);
+        poly_enable = 1;
         poly_mau_a <= data_a[i];
       end
+    @(posedge clk);
+    poly_enable = 0;
+    poly_mau_a <= 0;
   end
 endtask
 
@@ -100,16 +104,16 @@ initial begin
   clk = 0;
   poly_enable = 0;
   #(CLK_PERIOD * 10);
-  poly_enable = 1;
+  
   poly_mau_b = 24'd2773;
   #(CLK_PERIOD * 5);
 
-  test_data[0] = 24'd1;
-  test_data[1] = 24'd2;
-  test_data[2] = 24'd3;
-  test_data[3] = 24'd4;
-  test_data[4] = 24'd5;
-  test_data[5] = 24'd6;
+  test_data[0] = 24'd245;
+  test_data[1] = 24'd1603;
+  test_data[2] = 24'd497;
+  test_data[3] = 24'd940;
+  test_data[4] = 24'd2815;
+  test_data[5] = 24'd2961;
 
   pipeline_input(test_data);
 

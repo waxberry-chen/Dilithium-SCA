@@ -33,7 +33,7 @@
 //================================================ CHIP_SASEBO_GIII_AES
 module CHIP_SASEBO_GIII_POLY
   (// Local bus for GII
-   lbus_di_a, //地址和数�????????
+   lbus_di_a, //地址和数�????????
    lbus_do,   //
    lbus_wrn, lbus_rdn,
    lbus_clkn, lbus_rstn,
@@ -87,12 +87,12 @@ module CHIP_SASEBO_GIII_POLY
 
    assign osc_en_b = 1'b0;
    //------------------------------------------------
-   always @(posedge clk) if (lbus_wrn)  lbus_a  <= lbus_di_a;  //1 写地�??
-   always @(posedge clk) if (~lbus_wrn) lbus_di <= lbus_di_a;  //0 写数�??
+   always @(posedge clk) if (lbus_wrn)  lbus_a  <= lbus_di_a;  //1 写地�??
+   always @(posedge clk) if (~lbus_wrn) lbus_di <= lbus_di_a;  //0 写数�??
 
    //(* keep = "TRUE" *)wire[11:0] a,b;
-   (* keep = "TRUE" *) wire[23:0]a;
-   (* keep = "TRUE" *) wire[23:0]b;
+   (* keep = "TRUE" *) wire[11:0]a;
+   (* keep = "TRUE" *) wire[11:0]b;
   
 
    LBUS_IF lbus_if
@@ -152,86 +152,142 @@ module CHIP_SASEBO_GIII_POLY
    //generate
       //for(i= 0; i<1; i=i+1) begin
       
-        `define PWM     4'b0100
-        `define qNUM    24'd3329
-        `define mNUM    25'd5039
-        `define nNUM    5'd12
-     wire poly_kd_sel;//0:kyber  1:dilithium
-wire poly_pwm2_odd_even_sel; // for lyber PWM2
-wire [1:0] poly_duv_mode;//00:du=10 01:du=11 10:dv=4 11:dv=5
-wire [3:0] poly_alu_mode;
-wire [1:0] poly_compress; //00:no compress 01:compress 11:decompress
-wire [1:0] poly_decompose;//00:no decompose 01:(q-1)/44  11:(q-1)/16
+      `define PWM     4'b0100
+      `define qNUM    24'd3329
+      `define mNUM    25'd5039
+      `define nNUM    5'd12
+      wire poly_kd_sel;//0:kyber  1:dilithium
+      wire poly_pwm2_odd_even_sel; // for lyber PWM2
+      wire [1:0] poly_duv_mode;//00:du=10 01:du=11 10:dv=4 11:dv=5
+      wire [3:0] poly_alu_mode;
+      wire [1:0] poly_compress; //00:no compress 01:compress 11:decompress
+      wire [1:0] poly_decompose;//00:no decompose 01:(q-1)/44  11:(q-1)/16
 
-wire [23:0] poly_mau_a; // mm num1
-wire [23:0] poly_mau_b; // mm num2
-wire poly_enable;
+      wire [23:0] poly_mau_a; // mm num1
+      wire [23:0] poly_mau_b; // mm num2
+      wire poly_enable;
 
-wire [23:0] poly_mau_c; // 0
-wire [23:0] poly_mau_d; // 0
-wire [23:0] poly_q;
-wire [24:0] poly_barret_m;
-wire [4:0] poly_mm_N;
+      wire [23:0] poly_mau_c; // 0
+      wire [23:0] poly_mau_d; // 0
+      wire [23:0] poly_q;
+      wire [24:0] poly_barret_m;
+      wire [4:0] poly_mm_N;
 
 
-wire poly_valid;
-wire [23:0] poly_mau_o0;
-wire [23:0] poly_mau_o1;
+      wire poly_valid;
+      wire [23:0] poly_mau_o0;
+      wire [23:0] poly_mau_o1;
 
-assign poly_kd_sel = 1'b1;//Dilithium
-assign poly_pwm2_odd_even_sel = 1'b0;
-assign poly_duv_mode = 2'b00;
-assign poly_alu_mode = `PWM;
-assign poly_compress = 2'b00;
-assign poly_decompose = 2'b00;
+      assign poly_kd_sel = 1'b1;//Dilithium
+      assign poly_pwm2_odd_even_sel = 1'b0;
+      assign poly_duv_mode = 2'b00;
+      assign poly_alu_mode = `PWM;
+      assign poly_compress = 2'b00;
+      assign poly_decompose = 2'b00;
 
-assign poly_mau_c = 24'd0;
-assign poly_mau_d = 24'd0;
-assign poly_q = `qNUM;
-assign poly_barret_m = `mNUM;
-assign poly_mm_N = `nNUM;
+      assign poly_mau_c = 24'd0;
+      assign poly_mau_d = 24'd0;
+      assign poly_q = `qNUM;
+      assign poly_barret_m = `mNUM;
+      assign poly_mm_N = `nNUM;
 
-// Ctr Logic
-assign poly_mau_a = a;
-assign poly_mau_b = b;
-assign poly_enable = working_flag;
+      // Ctr Logic
+      assign poly_mau_a = a;
+      assign poly_mau_b = b;
+      assign poly_enable = working_flag;
 
-genvar i;
+   genvar i;
 
-generate
-    for(i=0;i<10;i=i+1 )begin
-(* dont_touch = "true"*) (* keep = "true" *) POLY_MAU u_POLY_MAU(
-  .clk(clk),
-  .rst_n(rst_n),
-  .poly_kd_sel(poly_kd_sel),//0:kyber  1:dilithium
-  .poly_pwm2_odd_even_sel(poly_pwm2_odd_even_sel), // for lyber PWM2
-  .poly_duv_mode(poly_duv_mode),//00:du=10 01:du=11 10:dv=4 11:dv=5
-  .poly_alu_mode(poly_alu_mode),
-  .poly_compress(poly_compress), //00:no compress 01:compress 11:decompress
-  .poly_decompose(poly_decompose),//00:no decompose 01:(q-1)/44  11:(q-1)/16
-  .poly_mau_a(poly_mau_a),
-  .poly_mau_b(poly_mau_b),
-  .poly_mau_c(poly_mau_c),
-  .poly_mau_d(poly_mau_d),
-  .poly_q(poly_q),
-  .poly_barret_m(poly_barret_m),
-  .poly_mm_N(poly_mm_N),
-  .poly_enable(poly_enable),
-  .poly_valid(poly_valid),
-  .poly_mau_o0(poly_mau_o0),
-  .poly_mau_o1(poly_mau_o1)
+   generate
+      for(i=0;i<1;i=i+1)begin
+      (* dont_touch = "true"*) (* keep = "true" *) POLY_MAU u_POLY_MAU(
+        .clk(clk),
+        .rst_n(rst_n),
+        .poly_kd_sel(poly_kd_sel),//0:kyber  1:dilithium
+        .poly_pwm2_odd_even_sel(poly_pwm2_odd_even_sel), // for lyber PWM2
+        .poly_duv_mode(poly_duv_mode),//00:du=10 01:du=11 10:dv=4 11:dv=5
+        .poly_alu_mode(poly_alu_mode),
+        .poly_compress(poly_compress), //00:no compress 01:compress 11:decompress
+        .poly_decompose(poly_decompose),//00:no decompose 01:(q-1)/44  11:(q-1)/16
+        .poly_mau_a(poly_mau_a),
+        .poly_mau_b(poly_mau_b),
+        .poly_mau_c(poly_mau_c),
+        .poly_mau_d(poly_mau_d),
+        .poly_q(poly_q),
+        .poly_barret_m(poly_barret_m),
+        .poly_mm_N(poly_mm_N),
+        .poly_enable(poly_enable),
+        .poly_valid(poly_valid),
+        .poly_mau_o0(poly_mau_o0),
+        .poly_mau_o1(poly_mau_o1)
 
-);
+      );
      end
    endgenerate
  
-
 // ******************** User add code finish ********************
-   
 endmodule 
 
 
    
+// //================================================ MK_CLKRST
+// module MK_CLKRST (clkin, rstnin, clk, rst);
+//    //synthesis attribute keep_hierarchy of MK_CLKRST is no;
+   
+//    //------------------------------------------------
+//    input  clkin, rstnin;
+//    output clk, rst;
+   
+//    //------------------------------------------------
+//    wire   refclk;
+// //   wire   clk_dcm, locked;
+
+//    //------------------------------------------------ clock
+//    IBUFG u10 (.I(clkin), .O(refclk)); 
+
+// /*
+//    DCM_BASE u11 (.CLKIN(refclk), .CLKFB(clk), .RST(~rstnin),
+//                  .CLK0(clk_dcm),     .CLKDV(),
+//                  .CLK90(), .CLK180(), .CLK270(),
+//                  .CLK2X(), .CLK2X180(), .CLKFX(), .CLKFX180(),
+//                  .LOCKED(locked));
+//    BUFG  u12 (.I(clk_dcm),   .O(clk));
+// */
+
+//    BUFG  u12 (.I(refclk),   .O(clk));
+//    // changed
+//    // assign clk = ~clkin;
+
+//    //------------------------------------------------ reset
+//    MK_RST u20 (.locked(rstnin), .clk(clk), .rst(rst));
+// endmodule // MK_CLKRST
+
+
+
+// //================================================ MK_RST
+// module MK_RST (locked, clk, rst);
+//    //synthesis attribute keep_hierarchy of MK_RST is no;
+   
+//    //------------------------------------------------
+//    input  locked, clk;
+//    output rst;
+
+//    //------------------------------------------------
+//    // delay for fpga
+//    reg [15:0] cnt;
+   
+//    //------------------------------------------------
+//    always @(posedge clk or negedge locked) 
+//      if (~locked)    cnt <= 16'h0;
+//      else if (~&cnt) cnt <= cnt + 16'h1;
+
+//    // changed in 251102-mxw
+//    assign rst = ~&cnt;
+//    // assign rst = ~locked;
+// endmodule // MK_RST
+
+
+
 //================================================ MK_CLKRST
 module MK_CLKRST (clkin, rstnin, clk, rst);
    //synthesis attribute keep_hierarchy of MK_CLKRST is no;
@@ -245,7 +301,7 @@ module MK_CLKRST (clkin, rstnin, clk, rst);
 //   wire   clk_dcm, locked;
 
    //------------------------------------------------ clock
-   IBUFG u10 (.I(clkin), .O(refclk)); 
+   //IBUFG u10 (.I(clkin), .O(refclk)); 
 
 /*
    DCM_BASE u11 (.CLKIN(refclk), .CLKFB(clk), .RST(~rstnin),
@@ -256,9 +312,9 @@ module MK_CLKRST (clkin, rstnin, clk, rst);
    BUFG  u12 (.I(clk_dcm),   .O(clk));
 */
 
-   BUFG  u12 (.I(refclk),   .O(clk));
+   //BUFG  u12 (.I(refclk),   .O(clk));
    // changed
-   // assign clk = ~clkin;
+   assign clk = ~clkin;
 
    //------------------------------------------------ reset
    MK_RST u20 (.locked(rstnin), .clk(clk), .rst(rst));
@@ -284,6 +340,6 @@ module MK_RST (locked, clk, rst);
      else if (~&cnt) cnt <= cnt + 16'h1;
 
    // changed in 251102-mxw
-   assign rst = ~&cnt;
-   // assign rst = ~locked;
+   //assign rst = ~&cnt;
+   assign rst = ~locked;
 endmodule // MK_RST

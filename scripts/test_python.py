@@ -142,12 +142,16 @@ def draw_trace(act_trace,sim_trace,position,x_num = 5000):
     plt.savefig(save_path,dpi=300)
 
 if __name__ == "__main__":
-    file_trace = '/15T/Projects/Dilithium-SCA/data/traces/2773_kyber_q3329/averaged/align/averaged_mau_loop20.txt'
-    if not os.path.isfile(file_trace):
-        raise ValueError("file path wrong")
-    file_random = '/15T/Projects/Dilithium-SCA/data/special_files/random_3000_0-3328.txt'
-    if not os.path.isfile(file_random):
-        raise ValueError("file path wrong")
+    # file_trace = '/15T/Projects/Dilithium-SCA/data/traces/2773_kyber_q3329/averaged/align/averaged_mau_loop20.txt'
+    # if not os.path.isfile(file_trace):
+    #     raise ValueError("file path wrong")
+    # file_random = '/15T/Projects/Dilithium-SCA/data/special_files/random_3000_0-3328.txt'
+    # if not os.path.isfile(file_random):
+    #     raise ValueError("file path wrong")
     
-    trace_act,trace_sim,position = get_sim_actual(file_trace=file_trace,file_random=file_random,trace_num=2001)
-    draw_trace(act_trace=trace_act,sim_trace=trace_sim,position=position)
+    # trace_act,trace_sim,position = get_sim_actual(file_trace=file_trace,file_random=file_random,trace_num=2001)
+    # draw_trace(act_trace=trace_act,sim_trace=trace_sim,position=position)
+
+    # print(get_plaintexts(file_path=file_random,trace_number=0))
+    for i in range(144):
+        print(2**(i%24)-1)

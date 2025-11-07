@@ -14,8 +14,8 @@ module tb_lbus_if;
     reg             tb_lbus_rd; // Assert output data
     wire [15:0]     tb_lbus_do; // Output data (Cryptographic module -> Controller)
     // to hardware 
-    wire [23:0]     tb_a;
-    wire [23:0]     tb_b;
+    wire [11:0]     tb_a;
+    wire [11:0]     tb_b;
     wire            tb_blk_krdy; 
     wire            tb_blk_drdy; // blk_drdy assigned to gpio
     wire            tb_blk_en  ; 
@@ -108,7 +108,6 @@ module tb_lbus_if;
     initial begin
         $fsdbDumpfile("waves/tb_lbus_if.fsdb");
         $fsdbDumpvars(0, u_LBUS_IF);
-        $fsdbDumpMDA(u_LBUS_IF.fifo_a);
 
         @(negedge rst_top);
         $display("INFO: Reset is released");
@@ -118,22 +117,10 @@ module tb_lbus_if;
         #(CLK_PERIOD * 5);
 
         $display("INFO: Start writing a...");
-        lbus_write(16'h0100, 16'haaaa);
-        lbus_write(16'h0101, 16'h00bb);
-        lbus_write(16'h0102, 16'hcccc);
-        lbus_write(16'h0103, 16'h00dd);
-        lbus_write(16'h0104, 16'heeee);
-        lbus_write(16'h0105, 16'h00ff);
-        lbus_write(16'h0106, 16'h1111);
-        lbus_write(16'h0107, 16'h0022);
-        lbus_write(16'h0108, 16'h3333);
-        lbus_write(16'h0109, 16'h0044);
-        lbus_write(16'h010a, 16'h5555);
-        lbus_write(16'h010b, 16'h0066);
+        lbus_write(16'h0100, 16'habcd);
 
         $display("INFO: Start writing b...");
-        lbus_write(16'h0110, 16'h7777);
-        lbus_write(16'h0111, 16'h0088);
+        lbus_write(16'h0102, 16'd2773);
 
         $display("INFO: Writing 'start'...");
         lbus_write(16'h0002, 16'h0001);

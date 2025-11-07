@@ -210,8 +210,8 @@ void MainWindow::Get_Sever_inst()
         }
 
         poly_b = 2773;
-        this->hw->pData_In->write(0x0100,poly_b & 0x0000ffff);
-        this->hw->pData_In->write(0x0101,poly_b >> 16);
+        this->hw->pData_In->write(0x0110,poly_b & 0x0000ffff);
+        this->hw->pData_In->write(0x0111,poly_b >> 16);
         this->hw->pData_In->write(0x0002,0x0001); // start FPGA
         qDebug()<< "poly_b = " << poly_b << endl;
         // ********** end send **********

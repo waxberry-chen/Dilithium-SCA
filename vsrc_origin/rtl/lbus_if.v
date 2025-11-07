@@ -34,12 +34,31 @@
 
 
 //================================================ LBUS_IF
-module LBUS_IF
-  (lbus_a, lbus_di, lbus_do, lbus_wr, lbus_rd, // Local bus
-   a,b,
-   blk_dout, blk_krdy, blk_drdy, blk_kvld, blk_dvld,
-    blk_en, blk_rstn,
-   clk, rst);                                  // Clock and reset
+module LBUS_IF(
+  // input signals
+  lbus_a , // Address
+  lbus_di, // Input data  (Controller -> Cryptographic module)
+  lbus_wr, // Assert input data
+  lbus_rd, // Assert output data
+  lbus_do, // Output data (Cryptographic module -> Controller)
+  a ,
+  b ,
+  blk_krdy, 
+  blk_drdy, // blk_drdy assigned to gpio
+  blk_en  , 
+  blk_rstn,
+  blk_dout,
+  blk_kvld, 
+  blk_dvld,
+  clk, 
+  rst       // high valid
+);   
+// module LBUS_IF
+//   (lbus_a, lbus_di, lbus_do, lbus_wr, lbus_rd, // Local bus
+//    a,b,
+//    blk_dout, blk_krdy, blk_drdy, blk_kvld, blk_dvld,
+//     blk_en, blk_rstn,
+//    clk, rst);                                  // Clock and reset
    
    //------------------------------------------------
    // Local bus
@@ -178,9 +197,6 @@ module LBUS_IF
         //  16'h014E : Sel_Tree[ 63: 48]   <= lbus_di;
          
         //  16'h0150 : Wots_Mode           <= lbus_di;
-         
-         
-
         endcase
 
       end

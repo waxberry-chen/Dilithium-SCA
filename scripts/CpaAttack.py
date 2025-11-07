@@ -70,16 +70,23 @@ qNUM = 3329
 def distance(plaintexts,key):
     global a_last
     p0 = 0
-    for i in range(4):
-        if i :
-            p0 += HD((plaintexts[4-i]*key),(plaintexts[5-i]*key))
-        else :
-            p0 += HD(plaintexts[4-i]*key,plaintexts[5-i]*key)
+    for i in range(3):
+        p0 += HD((plaintexts[2-i]*key),(plaintexts[3-i]*key))
 
-    mm_result = HD(plaintexts[0]*key%qNUM,plaintexts[1]*key%qNUM)
-    output = HD(a_last*key%qNUM,plaintexts[0]*key%qNUM)
-    a_last = plaintexts[5]
-    return output  + mm_result
+    input_7 = HD(plaintexts[5], 0)
+    input_6 = HD(plaintexts[4], plaintexts[5])
+    input_5 = HD(plaintexts[3], plaintexts[4])
+    input_4 = HD(plaintexts[2], plaintexts[3])
+    input_3 = HD(plaintexts[1], plaintexts[2])
+    input_2 = HD(plaintexts[0], plaintexts[1])
+    input_1 = HD(a_last, plaintexts[0])
+
+    mm_result = HD(plaintexts[0]*key%qNUM, plaintexts[1]*key%qNUM)
+    output = HD((a_last*key)%qNUM, (plaintexts[0]*key)%qNUM)
+
+    a_last = plaintexts[4]
+    # return output + mm_result
+    return output + p0
 
     # ##### Verify #####
     # wn = 1729
@@ -109,7 +116,10 @@ def process_key(key, power_trace_mat, plaintext_list):
     H_distance_mat = np.zeros((len(plaintext_list), sample_number))
 
     for index, plaintexts in enumerate(plaintext_list):
+        
         h = distance(plaintexts, key)
+        if (key == 2773) & ((index % 500 == 0) | (index % 500 == 1)):
+            print(f"--- [DEBUG] h = {h}; plaintext = {plaintexts}; key = {key}\n\t\toutput = {(plaintexts[0]*key)%qNUM}, {(plaintexts[1]*key)%qNUM}, {(plaintexts[2]*key)%qNUM}, {(plaintexts[3]*key)%qNUM}, {(plaintexts[4]*key)%qNUM}, {(plaintexts[5]*key)%qNUM}")
         H_distance_mat[index, :] = h
 
     return key, column_pearson_corr(power_trace_mat, H_distance_mat)
@@ -174,7 +184,17 @@ class CPA:
                         power_trace = power_trace[self.low_sample:self.high_sample]
                         # >>> Save to matrix >>>
                         self.power_trace_mat[plaintext_number, :] = power_trace
-                        self.plaintext_list.append(get_plaintexts(self.random_plaintext_file,plaintext_number))
+                        ## changed
+                        # if plaintext_number:
+                        #     current_plaintexts = get_plaintexts(self.random_plaintext_file,plaintext_number-1)
+                        # else :
+                        #     current_plaintexts = get_plaintexts(self.random_plaintext_file,plaintext_number)
+                        current_plaintexts = get_plaintexts(self.random_plaintext_file,plaintext_number)
+                        ## change end
+                        self.plaintext_list.append(current_plaintexts)
+                        if number % 500 == 0:
+                            print(f"\n--- [DEBUG] 轨迹计数: {number} (文件中的 plaintext_number: {plaintext_number}) ---")
+                            print(f"--- [DEBUG] Plaintexts: {current_plaintexts}\n")
                         number += 1
                         read_bar.update(1)
                     
@@ -411,7 +431,7 @@ class Draw:
         plt.axhline(0, color='black', linewidth=0.5)
 
         # 设置纵轴范围 (可根据需要调整)
-        plt.ylim(-0.2, 0.2)  # 例如：设置纵轴范围为 -0.5 到 0.5
+        plt.ylim(-0.3, 0.3)  # 例如：设置纵轴范围为 -0.5 到 0.5
         time_path = os.path.join(self.save_path,time_tag+'/')
         os.makedirs(time_path,exist_ok=True)
         fig1_path = os.path.join(self.save_path,time_tag+'/', 'fig1_corrs_over_time.png')

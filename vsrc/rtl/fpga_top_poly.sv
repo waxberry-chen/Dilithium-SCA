@@ -33,7 +33,7 @@
 //================================================ CHIP_SASEBO_GIII_AES
 module CHIP_SASEBO_GIII_POLY
   (// Local bus for GII
-   lbus_di_a, //地址和数�???????
+   lbus_di_a, //地址和数�???????
    lbus_do,   //
    lbus_wrn, lbus_rdn,
    lbus_clkn, lbus_rstn,
@@ -87,8 +87,8 @@ module CHIP_SASEBO_GIII_POLY
 
    assign osc_en_b = 1'b0;
    //------------------------------------------------
-   always @(posedge clk) if (lbus_wrn)  lbus_a  <= lbus_di_a;  //1 写地�?
-   always @(posedge clk) if (~lbus_wrn) lbus_di <= lbus_di_a;  //0 写数�?
+   always @(posedge clk) if (lbus_wrn)  lbus_a  <= lbus_di_a;  //1 写地�?
+   always @(posedge clk) if (~lbus_wrn) lbus_di <= lbus_di_a;  //0 写数�?
 
    //(* keep = "TRUE" *)wire[11:0] a,b;
    (* keep = "TRUE" *) wire[23:0]a;
@@ -133,18 +133,17 @@ module CHIP_SASEBO_GIII_POLY
       if (~rst_n) begin
          working_flag <= 1'b0;
          working_cycle_cnt <= 3'd0;
-
       end else begin
-
          if(start)begin
             working_flag <= 1'b1;
-         end
-
-         if(working_flag&(working_cycle_cnt<`WORKING_CYCLE_NUM-1'b1)) begin
-            working_cycle_cnt <= working_cycle_cnt + 1'b1;
-         end else if(working_flag &(working_cycle_cnt>=`WORKING_CYCLE_NUM-1'b1)) begin
-            working_flag <= 1'b0;
-            working_cycle_cnt <= 3'd0;
+            working_cycle_cnt <= 3'b0;
+         end else if (working_flag) begin 
+            if(working_cycle_cnt<`WORKING_CYCLE_NUM-1'b1) begin
+               working_cycle_cnt <= working_cycle_cnt + 1'b1;
+            end else begin
+               working_flag <= 1'b0;
+               working_cycle_cnt <= 3'd0;
+            end
          end
       end
    end

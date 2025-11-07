@@ -8,8 +8,8 @@
 ########################
 #      Module Name     #
 ########################
-MODULE := POLY_MAU
-# MODULE := lbus_if
+# MODULE := POLY_MAU
+MODULE := lbus_if
 # MODULE := chip_sasebo_giii_poly
 # MODULE := test_power
 
