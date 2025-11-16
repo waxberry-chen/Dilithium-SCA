@@ -153,5 +153,39 @@ if __name__ == "__main__":
     # draw_trace(act_trace=trace_act,sim_trace=trace_sim,position=position)
 
     # print(get_plaintexts(file_path=file_random,trace_number=0))
-    for i in range(144):
-        print(2**(i%24)-1)
+    # for i in range(144):
+    #     print(2**(i%24)-1)
+    m= 5039
+    n=24
+    p=3329
+
+    test_a = [123,333,555,666,777]
+    test_b = 2773
+
+    def cal_wt_xor(a,b):
+        p = a*b
+        p_temp = p - ((p*m)>>n)*q
+        if p_temp > p:
+            p = p_temp - p
+        else :
+            p = p_temp
+        return p
+
+    def cal_xor(a,b):
+        v=0xabcd
+        p=a*b^v
+        p_temp = p - (p*m>>n)*q
+        if p_temp > p:
+            p = p_temp - p
+        else :
+            p = p_temp
+        return p^v
+    
+    def cal(a,b):
+        return a*b%q
+
+    for a in test_a:
+        p1 = cal(a,test_b)
+        p2 = cal_wt_xor(a,test_b)
+        p3 = cal_xor(a,test_b)
+        print(f'a:{a},b:{test_b}, cal:{p1},cal with out xor:{p2},cal with xor:{p3}')

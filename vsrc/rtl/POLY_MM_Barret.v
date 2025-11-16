@@ -17,6 +17,10 @@ module POLY_MM_Barret(
     // reg  [4:0]  poly_mm_N;
     // reg  [4:0]  poly_mm_N_d1, poly_mm_N_d2, poly_mm_N_d3;
     reg  [24:0] poly_mm_P0_d_reg0, poly_mm_P0_d_reg1, poly_mm_P0_d_reg2;
+    //change start
+    reg  [24:0] poly_mm_P0_d_reg0_dummy, poly_mm_P0_d_reg1_dummy, poly_mm_P0_d_reg2_dummy;
+    // change end
+
     //reg  [23:0] poly_mm_q_d1, poly_mm_q_d2, poly_mm_q_d3;
     //reg  [24:0] poly_mm_m_d1;
     wire [47:0] poly_mm_P0;
@@ -32,6 +36,17 @@ module POLY_MM_Barret(
     wire [23:0] poly_mm_result_temp;
     reg  [2:0]  poly_mm_enable_d;
     reg  [24:0] poly_mm_R_mask;
+
+    //change start
+    reg  [24:0] poly_mm_T0_reg_dummy, poly_mm_T1_reg_dummy, poly_mm_T2_reg_dummy;
+    // change end
+
+    // ***** Blind Registers *****
+    // (* KEEP = "TRUE" *) reg [15:0] lfsr_reg;
+    // (* KEEP = "TRUE" *) reg [31:0] dummy_noise_output;
+    (* KEEP = "TRUE" *) reg [23:0] poly_mm_result_dummy;
+    (* KEEP = "TRUE" *) reg [23:0] poly_mm_result_dummy_d0;
+    (* KEEP = "TRUE" *) wire [23:0] mm_dummy;
 
     // always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
     //     if(!poly_mm_rst_n) begin
@@ -271,6 +286,10 @@ module POLY_MM_Barret(
     always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
         if(!poly_mm_rst_n) begin
             poly_mm_result <= 24'b0;
+            // change start 
+            poly_mm_result_dummy <= 24'b0;
+            poly_mm_result_dummy_d0 <= 24'b0;
+            // change end
         end
         else if(decompose[0] == 1'b1)begin
             if(decompose == 2'b01) poly_mm_result <= poly_mm_P0[30] ? poly_mm_P0[45:31] + 1'b1 : poly_mm_P0[45:31] ;
@@ -287,6 +306,8 @@ module POLY_MM_Barret(
             2'b11: //round(12bit * 22'd315 >> 15)
                 poly_mm_result <= {19'b0, (poly_mm_P0[14] ? poly_mm_P0[19:15] + 1'b1 : poly_mm_P0[19:15])};
           endcase
+          poly_mm_result_dummy <= mm_dummy;
+          poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
         end
         else if(compress == 2'b11)begin //decompress
           case(duv_mode) //00:du=10 01:du=11 10:dv=4 11:dv=5
@@ -299,11 +320,20 @@ module POLY_MM_Barret(
             2'b11: //round(12bit × 3329 >> 5)
                 poly_mm_result <= {12'b0, (poly_mm_P0[4] ? poly_mm_P0[16:5] + 1'b1 : poly_mm_P0[16:5])};
           endcase
+          poly_mm_result_dummy <= mm_dummy;
+          poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
         end
         else begin
             poly_mm_result <= poly_mm_result_temp;
+            // change start 
+            poly_mm_result_dummy <= mm_dummy;
+            poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
+            // change end
         end
     end
+    // change start 
+    assign mm_dummy = (poly_mm_result^poly_mm_result_dummy)~^poly_mm_result_temp;
+    // change end
 
     always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
         if(!poly_mm_rst_n) begin
@@ -313,4 +343,29 @@ module POLY_MM_Barret(
             {poly_mm_valid, poly_mm_enable_d} <= {poly_mm_enable_d, poly_mm_enable};
         end
     end
+
+    // always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin 
+    //     if(!poly_mm_rst_n) begin
+    //         lfsr_reg <= 16'hACE1;   // Random none-zero value
+    //     end else if (poly_mm_enable) begin
+    //         if (lfsr_reg == 24'h0000 || lfsr_reg[0] === 1'bx) begin
+    //             lfsr_reg <= 16'hACE1;
+    //         end else begin
+    //             lfsr_reg <= {lfsr_reg[14:0], (lfsr_reg[15] ^ lfsr_reg[13] ^ lfsr_reg[10] ^ lfsr_reg[6])};
+    //         end
+    //     end else begin
+    //         lfsr_reg <= lfsr_reg;
+    //     end
+    // end
+
+    // always @(posedge poly_mm_clk) begin
+    //     if(!poly_mm_rst_n) begin
+    //         dummy_noise_output <= 32'hAABBCCDD;   // Random none-zero value
+    //     end else if(poly_mm_enable) begin
+    //         dummy_noise_output <= {dummy_noise_output[15:0], (lfsr_reg[7:0] * lfsr_reg[15:8])};
+    //     end else begin
+    //         dummy_noise_output <= dummy_noise_output;
+    //     end
+    // end
+
 endmodule

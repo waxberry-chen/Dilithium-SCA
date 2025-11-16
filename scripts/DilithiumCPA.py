@@ -8,7 +8,7 @@ import os
 """
 special_b = 1037
 # DIR_TAG = '_kyber_q3329'
-DIR_TAG = '_test2_x10'
+DIR_TAG = '_hide2mm_x2'
 DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}{DIR_TAG}/averaged/"
 # DATA_ROOT = "/15T/Projects/Dilithium-SCA/data/traces/"
 # TRACE_FILE_NAME = "mau_traces-loop0.txt"
@@ -44,7 +44,7 @@ LOW_SAMPLE = 0
 HIGH_SAMPLE = 5000
 SAMPLE_NUM_RESULT = HIGH_SAMPLE - LOW_SAMPLE
 
-DOWNSAMPLE_FACTOR = 10
+DOWNSAMPLE_FACTOR = 20
 
 
 

@@ -103,8 +103,11 @@ initial begin
   $fsdbDumpvars(0, tb_POLY_MAU);
   clk = 0;
   poly_enable = 0;
+  rst_n = 0;
+  poly_mau_a = 0;
   #(CLK_PERIOD * 10);
-  
+  rst_n = 1;
+  #(CLK_PERIOD * 5);
   poly_mau_b = 24'd2773;
   #(CLK_PERIOD * 5);
 
@@ -117,7 +120,7 @@ initial begin
 
   pipeline_input(test_data);
 
-  #(CLK_PERIOD * 20);
+  #(CLK_PERIOD * 30);
   $finish;
 end
 

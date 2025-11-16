@@ -6,8 +6,8 @@ from TraceProcess import TraceProcess ,MkDir
 
 """
 
-KEY_NUM = 1037
-DIR_TAG = '_test2_x10'
+KEY_NUM = 1009
+DIR_TAG = '_test3_x20'
 
 FILE_NUM = 20
 # DIR_TAG = '_kyber_dont_touch'
@@ -27,7 +27,7 @@ SOURCE_FILE_PREFIX_NAME = 'mau_traces-loop'
 SAVE_ROOT = DATA_ROOT +f'{KEY_NUM}{DIR_TAG}/averaged/'
 SAVE_FILE_NAME = "averaged_mau_loop"
 
-ALIGN_WINDOW = (330,340)
+ALIGN_WINDOW = (500,750)
 ALIGN_MAX_SHIFT = 7
 
 
