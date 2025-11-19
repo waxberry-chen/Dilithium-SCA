@@ -37,9 +37,6 @@ module POLY_MM_Barret(
     reg  [2:0]  poly_mm_enable_d;
     reg  [24:0] poly_mm_R_mask;
 
-    //change start
-    reg  [24:0] poly_mm_T0_reg_dummy, poly_mm_T1_reg_dummy, poly_mm_T2_reg_dummy;
-    // change end
 
     // ***** Blind Registers *****
     // (* KEEP = "TRUE" *) reg [15:0] lfsr_reg;

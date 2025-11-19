@@ -6,10 +6,10 @@ from TraceProcess import TraceProcess ,MkDir
 
 """
 
-KEY_NUM = 1009
-DIR_TAG = '_test3_x20'
+KEY_NUM = 1037
+DIR_TAG = 'without_mm_loop5'
 
-FILE_NUM = 20
+FILE_NUM = 5
 # DIR_TAG = '_kyber_dont_touch'
 
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     ### two modes:
     ## mkdir ; process
     ###
-    # mode = 'mkdir'
+    #mode = 'mkdir'
     mode = 'process'
     if mode == 'mkdir':
         dir_set.mk_dir()

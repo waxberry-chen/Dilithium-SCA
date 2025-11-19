@@ -8,12 +8,14 @@ import os
 """
 special_b = 1037
 # DIR_TAG = '_kyber_q3329'
-DIR_TAG = '_hide2mm_x2'
+# DIR_TAG = '_test4_x2'
+DIR_TAG = 'without_mm_loop5'
 DATA_ROOT = f"/15T/Projects/Dilithium-SCA/data/traces/{special_b}{DIR_TAG}/averaged/"
 # DATA_ROOT = "/15T/Projects/Dilithium-SCA/data/traces/"
 # TRACE_FILE_NAME = "mau_traces-loop0.txt"
-TRACE_FILE_NAME = "averaged_mau_loop20.txt"
 # TRACE_FILE_NAME = "averaged_mau_loop20.txt"
+# TRACE_FILE_NAME = "averaged_mau_loop20.txt"
+TRACE_FILE_NAME = "averaged_mau_loop5.txt"
 
 
 ### file path

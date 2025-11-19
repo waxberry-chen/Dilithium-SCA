@@ -75,6 +75,36 @@ module POLY_ALU(
         .poly_mm_result  ( poly_mm_dout  )
     );
 
+    // dummy barret
+
+    wire [23:0] poly_mm_dina_dummy = {poly_mm_dina[23:12], poly_mm_dina[5:0], poly_mm_dina[11:6]};
+    wire [23:0] poly_mm_dinb_dummy = {poly_mm_dina[23:12], ~poly_mm_dinb[11:0]};
+    wire [23:0] poly_mm_dout_dummy;
+    wire        poly_mm_valid_dummy;
+
+    POLY_MM_Barret u_POLY_MM_Barret_dummy(
+        .poly_mm_clk    ( poly_clk    ),
+        .poly_mm_rst_n  ( poly_rst_n  ),
+        .poly_mm_enable ( poly_mm_enable_reg ),
+        .decompose      ( poly_decompose ),
+        .duv_mode       ( poly_duv_mode  ),
+        .compress       ( poly_compress  ),
+        .poly_mm_a      ( poly_mm_dina_dummy      ),
+        .poly_mm_b      ( poly_mm_dinb_dummy      ),
+        .poly_mm_m      ( poly_barret_m      ),
+        .poly_mm_q      ( poly_q      ),
+        .poly_mm_N      ( poly_mm_N      ),
+        .poly_mm_valid  ( poly_mm_valid_dummy  ),
+        .poly_mm_result  ( poly_mm_dout_dummy  )
+    );
+    (* KEEP = "TRUE" *) reg [23:0] poly_mm_dout_dummy_delay;
+    always @(posedge poly_clk or negedge poly_rst_n)begin
+        if(poly_mm_valid_dummy) begin
+            poly_mm_dout_dummy_delay <= poly_mm_dout_dummy;
+        end
+    end
+
+
 
     assign poly_ms_a = poly_mode[6] ? (poly_mode[7] ? poly_delay_reg_4 : poly_data_in2)
                                     : poly_delay_reg_4;

@@ -1,6 +1,8 @@
 import time 
 import numpy as np
 import cupy as cp
+from CpaAttack import distance
+from CpaAttack import column_pearson_corr
 
 # a = cp.random.rand(10, 10)
 # b = cp.random.rand(10, 10)
@@ -61,7 +63,7 @@ def HD(num_before,num_after):
 
 def HD_all(num_before,num_after):
     LH,HL = HD(num_before,num_after)
-    return 1*HL
+    return 1*HL + 1* LH
 
 def get_trace(file_path,plaintext_num):
     line = linecache.getline(file_path,plaintext_num+1) # 读取第plaintext行的数据（0->plaintext_num-1）
@@ -141,6 +143,17 @@ def draw_trace(act_trace,sim_trace,position,x_num = 5000):
     save_path = '/15T/Projects/Dilithium-SCA/result/test.png'
     plt.savefig(save_path,dpi=300)
 
+a_last = 0
+
+def regs_transfer_count(plaintexts,key):
+    global a_last
+    mask = 0x1ffff
+    p0_d2 = HD_all(plaintexts[1]*key&mask,plaintexts[2]*key&mask)
+    p0_d1 = HD_all(plaintexts[2]*key&mask,plaintexts[3]*key&mask)
+    p0_d0 = HD_all(plaintexts[3]*key&mask,plaintexts[4]*key&mask)
+    a_last=plaintexts[5]
+    return p0_d0,p0_d1,p0_d2
+
 if __name__ == "__main__":
     # file_trace = '/15T/Projects/Dilithium-SCA/data/traces/2773_kyber_q3329/averaged/align/averaged_mau_loop20.txt'
     # if not os.path.isfile(file_trace):
@@ -155,37 +168,73 @@ if __name__ == "__main__":
     # print(get_plaintexts(file_path=file_random,trace_number=0))
     # for i in range(144):
     #     print(2**(i%24)-1)
-    m= 5039
-    n=24
-    p=3329
+    # m= 5039
+    # n=24
+    # p=3329
 
-    test_a = [123,333,555,666,777]
-    test_b = 2773
+    # test_a = [123,333,555,666,777]
+    # test_b = 2773
 
-    def cal_wt_xor(a,b):
-        p = a*b
-        p_temp = p - ((p*m)>>n)*q
-        if p_temp > p:
-            p = p_temp - p
-        else :
-            p = p_temp
-        return p
+    # def cal_wt_xor(a,b):
+    #     p = a*b
+    #     p_temp = p - ((p*m)>>n)*q
+    #     if p_temp > p:
+    #         p = p_temp - p
+    #     else :
+    #         p = p_temp
+    #     return p
 
-    def cal_xor(a,b):
-        v=0xabcd
-        p=a*b^v
-        p_temp = p - (p*m>>n)*q
-        if p_temp > p:
-            p = p_temp - p
-        else :
-            p = p_temp
-        return p^v
+    # def cal_xor(a,b):
+    #     v=0xabcd
+    #     p=a*b^v
+    #     p_temp = p - (p*m>>n)*q
+    #     if p_temp > p:
+    #         p = p_temp - p
+    #     else :
+    #         p = p_temp
+    #     return p^v
     
-    def cal(a,b):
-        return a*b%q
+    # def cal(a,b):
+    #     return a*b%q
 
-    for a in test_a:
-        p1 = cal(a,test_b)
-        p2 = cal_wt_xor(a,test_b)
-        p3 = cal_xor(a,test_b)
-        print(f'a:{a},b:{test_b}, cal:{p1},cal with out xor:{p2},cal with xor:{p3}')
+    # for a in test_a:
+    #     p1 = cal(a,test_b)
+    #     p2 = cal_wt_xor(a,test_b)
+    #     p3 = cal_xor(a,test_b)
+    #     print(f'a:{a},b:{test_b}, cal:{p1},cal with out xor:{p2},cal with xor:{p3}')
+
+    ############# test regs transfer
+    file_random = '/15T/Projects/Dilithium-SCA/data/special_files/random_3000_0-3328.txt'
+    save_path = "/15T/Projects/Dilithium-SCA/result/test/"
+    key = 1037
+    d0_list,d1_list,d2_list,all_list = [],[],[],[]
+    mm_list = []
+    number = 2994
+    for i in range(number):
+        plaitexts = get_plaintexts(file_path=file_random,trace_number=i)
+        p0_d0,p0_d1,p0_d2 = regs_transfer_count(plaintexts=plaitexts,key=key)
+        d0_list.append(p0_d0)
+        d1_list.append(p0_d1)
+        d2_list.append(p0_d2)
+        all_list.append(p0_d0+p0_d1+p0_d2)
+        mm = distance(plaintexts=plaitexts,key=key)
+        mm_list.append(mm)
+    rall = np.corrcoef(np.array(mm_list),np.array(all_list))[0,1]
+    print(f"mm/all: {rall}")
+    rd0 = np.corrcoef(np.array(mm_list),np.array(d0_list))[0,1]
+    print(f"mm/d0: {rd0}")
+    rd1 = np.corrcoef(np.array(mm_list),np.array(d1_list))[0,1]
+    print(f"mm/d1: {rd1}")
+    rd2 = np.corrcoef(np.array(mm_list),np.array(d2_list))[0,1]
+    print(f"mm/d2: {rd2}")
+    # x = [i for i in range(number)]
+    # plt.figure(0)
+    # plt.plot(x,mm_list,label="mm")
+    # plt.plot(x,d0_list,label="d0")
+    # plt.plot(x,d1_list,label="d1")
+    # plt.plot(x,d2_list,label="d2")
+    # plt.plot(x,all_list,label="d0+d1+d2")
+    # plt.legend()
+    # plt.savefig(save_path+'regs_transfer.png')
+
+  
