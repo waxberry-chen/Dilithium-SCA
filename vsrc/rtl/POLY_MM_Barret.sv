@@ -11,10 +11,8 @@ module POLY_MM_Barret(
     input [4:0]  poly_mm_N,
     input [23:0] poly_mm_q,
     (* dont_touch = "true" *)(* keep = "TRUE" *)output reg poly_mm_valid,
-    //(* dont_touch = "true" *)(* keep = "TRUE" *)output reg [23:0] poly_mm_result
-    // ***** mask enable
-    (* dont_touch = "true" *)(* keep = "TRUE" *)output reg [23:0] poly_mm_result_share1, 
-    (* dont_touch = "true" *)(* keep = "TRUE" *)output reg [23:0] poly_mm_result_share2
+    (* dont_touch = "true" *)(* keep = "TRUE" *)output [23:0] poly_mm_result
+    //output reg [23:0] poly_mm_result_s
 );
 
     // reg  [4:0]  poly_mm_N;
@@ -38,13 +36,12 @@ module POLY_MM_Barret(
 
 
     // ***** Blind Registers *****
-    (* dont_touch = "true" *)(* keep = "TRUE" *) reg [23:0] mask_lfsr_reg; 
-     //(* KEEP = "TRUE" *) reg [23:0] lfsr_reg;
+    // (* KEEP = "TRUE" *) reg [15:0] lfsr_reg;
     // (* KEEP = "TRUE" *) reg [31:0] dummy_noise_output;
     // (* KEEP = "TRUE" *) reg [23:0] poly_mm_result_dummy;
     // (* KEEP = "TRUE" *) reg [23:0] poly_mm_result_dummy_d0;
-//    (* dont_touch = "true" *)(* keep = "TRUE" *) reg [47:0] poly_mm_result_reg;// high 24 bit is useful result
-//    (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] mm_dummy;
+    (* dont_touch = "true" *)(* keep = "TRUE" *) reg [47:0] poly_mm_result_reg;// high 24 bit is useful result
+    (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] mm_dummy;
 
     // always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
     //     if(!poly_mm_rst_n) begin
@@ -282,139 +279,97 @@ module POLY_MM_Barret(
     wire [24:0] poly_mm_R_masked = poly_mm_R & poly_mm_R_mask;
     assign poly_mm_result_temp = (poly_mm_R_masked < poly_mm_q) ? poly_mm_R_masked[23:0]: poly_mm_R_masked - poly_mm_q;
     
-     always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
-         if(!poly_mm_rst_n) begin
-             //poly_mm_result <= 24'b0;
-            poly_mm_result_share1 <= 24'b0; 
-            poly_mm_result_share2 <= 24'b0;
-
-             // change start 
-//             poly_mm_result_dummy <= 24'b0;
-//             poly_mm_result_dummy_d0 <= 24'b0;
-             // change end
-         end
-//          else if(decompose[0] == 1'b1)begin
-//              if(decompose == 2'b01) poly_mm_result <= poly_mm_P0[30] ? poly_mm_P0[45:31] + 1'b1 : poly_mm_P0[45:31] ;
-//              else                   poly_mm_result <= poly_mm_P0[28] ? poly_mm_P0[45:29] + 1'b1 : poly_mm_P0[45:29] ;
-//          end
-//          else if(compress == 2'b01)begin //compress
-//            case(duv_mode) //2'b00:du=10 2'b01:du=11 2'b10:dv=4 2'b11:dv=5
-//              2'b00: //round(12bit * 22'd2580335 >> 23)
-//                  poly_mm_result <= {14'b0, (poly_mm_P0[22] ? poly_mm_P0[32:23] + 1'b1 : poly_mm_P0[32:23])};
-//              2'b01: //round(12bit * 22'd2580335 >> 22)
-//                  poly_mm_result <= {13'b0, (poly_mm_P0[21] ? poly_mm_P0[32:22] + 1'b1 : poly_mm_P0[32:22])};
-//              2'b10: //round(12bit * 22'd315 >> 16)
-//                  poly_mm_result <= {20'b0, (poly_mm_P0[15] ? poly_mm_P0[19:16] + 1'b1 : poly_mm_P0[19:16])};
-//              2'b11: //round(12bit * 22'd315 >> 15)
-//                  poly_mm_result <= {19'b0, (poly_mm_P0[14] ? poly_mm_P0[19:15] + 1'b1 : poly_mm_P0[19:15])};
-//            endcase
-// //           poly_mm_result_dummy <= mm_dummy;
-// //           poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
-//          end
-//          else if(compress == 2'b11)begin //decompress
-//            case(duv_mode) //00:du=10 01:du=11 10:dv=4 11:dv=5
-//              2'b00: //round(12bit × 3329 >> 10)
-//                  poly_mm_result <= {12'b0, (poly_mm_P0[9] ? poly_mm_P0[21:10] + 1'b1 : poly_mm_P0[21:10])};
-//              2'b01: //round(12bit × 3329 >> 11)
-//                  poly_mm_result <= {12'b0, (poly_mm_P0[10] ? poly_mm_P0[22:11] + 1'b1 : poly_mm_P0[22:11])};
-//              2'b10: //round(12bit × 3329 >> 4)
-//                  poly_mm_result <= {12'b0, (poly_mm_P0[3] ? poly_mm_P0[15:4] + 1'b1 : poly_mm_P0[15:4])};
-//              2'b11: //round(12bit × 3329 >> 5)
-//                  poly_mm_result <= {12'b0, (poly_mm_P0[4] ? poly_mm_P0[16:5] + 1'b1 : poly_mm_P0[16:5])};
-//            endcase
-// //           poly_mm_result_dummy <= mm_dummy;
-// //           poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
-//          end
-         else begin
-             //poly_mm_result <= poly_mm_result_temp;
-            poly_mm_result_share1 <= poly_mm_result_temp ^ mask_lfsr_reg; 
-            poly_mm_result_share2 <= mask_lfsr_reg;
-
-             // change start 
-//             poly_mm_result_dummy <= mm_dummy;
-//             poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
-             // change end
-         end
-     end
-    
-    // ***** mask the output ***** //
-
-
-    // (LFSR has self-starting design)
-    always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
-        if (!poly_mm_rst_n) begin
-            mask_lfsr_reg <= 24'hACE123;
-        end else if (poly_mm_enable) begin
-            if (mask_lfsr_reg == 24'd0 || mask_lfsr_reg[0] === 1'bx) begin 
-                mask_lfsr_reg <= 24'hACE123; 
-            end
-            else begin mask_lfsr_reg <= {mask_lfsr_reg[22:0], (mask_lfsr_reg[23]^mask_lfsr_reg[21]^mask_lfsr_reg[19]^mask_lfsr_reg[17])}; end
-        end
-    end
-
-    // *************************** //
-
-
-     // ***** add 2025/11/19 night *****
-    //  (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] a_xor_b;
-    //  (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] a_and_b;
-    //  (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] noise_combo;
-    //  (* dont_touch = "true" *)(* keep = "TRUE" *) reg [23:0] noise_reg;
-    //  assign a_xor_b = poly_mm_a ^ (poly_mm_b>>5) ^ (poly_mm_b<<3);
-    //  assign a_and_b = poly_mm_a & poly_mm_b;
-    //  assign noise_combo = a_xor_b ~^ a_and_b;
-     
-    //  always @(posedge poly_mm_clk) begin
-    //     if(poly_mm_enable) begin
-    //         noise_reg <= noise_combo;
-    //     end else begin
-    //         noise_reg <= 24'b0;
+    // always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
+    //     if(!poly_mm_rst_n) begin
+    //         poly_mm_result <= 24'b0;
+    //         // change start 
+    //         poly_mm_result_dummy <= 24'b0;
+    //         poly_mm_result_dummy_d0 <= 24'b0;
+    //         // change end
     //     end
-    //  end 
-     // ***** end *****
+    //     else if(decompose[0] == 1'b1)begin
+    //         if(decompose == 2'b01) poly_mm_result <= poly_mm_P0[30] ? poly_mm_P0[45:31] + 1'b1 : poly_mm_P0[45:31] ;
+    //         else                   poly_mm_result <= poly_mm_P0[28] ? poly_mm_P0[45:29] + 1'b1 : poly_mm_P0[45:29] ;
+    //     end
+    //     else if(compress == 2'b01)begin //compress
+    //       case(duv_mode) //2'b00:du=10 2'b01:du=11 2'b10:dv=4 2'b11:dv=5
+    //         2'b00: //round(12bit * 22'd2580335 >> 23)
+    //             poly_mm_result <= {14'b0, (poly_mm_P0[22] ? poly_mm_P0[32:23] + 1'b1 : poly_mm_P0[32:23])};
+    //         2'b01: //round(12bit * 22'd2580335 >> 22)
+    //             poly_mm_result <= {13'b0, (poly_mm_P0[21] ? poly_mm_P0[32:22] + 1'b1 : poly_mm_P0[32:22])};
+    //         2'b10: //round(12bit * 22'd315 >> 16)
+    //             poly_mm_result <= {20'b0, (poly_mm_P0[15] ? poly_mm_P0[19:16] + 1'b1 : poly_mm_P0[19:16])};
+    //         2'b11: //round(12bit * 22'd315 >> 15)
+    //             poly_mm_result <= {19'b0, (poly_mm_P0[14] ? poly_mm_P0[19:15] + 1'b1 : poly_mm_P0[19:15])};
+    //       endcase
+    //       poly_mm_result_dummy <= mm_dummy;
+    //       poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
+    //     end
+    //     else if(compress == 2'b11)begin //decompress
+    //       case(duv_mode) //00:du=10 01:du=11 10:dv=4 11:dv=5
+    //         2'b00: //round(12bit × 3329 >> 10)
+    //             poly_mm_result <= {12'b0, (poly_mm_P0[9] ? poly_mm_P0[21:10] + 1'b1 : poly_mm_P0[21:10])};
+    //         2'b01: //round(12bit × 3329 >> 11)
+    //             poly_mm_result <= {12'b0, (poly_mm_P0[10] ? poly_mm_P0[22:11] + 1'b1 : poly_mm_P0[22:11])};
+    //         2'b10: //round(12bit × 3329 >> 4)
+    //             poly_mm_result <= {12'b0, (poly_mm_P0[3] ? poly_mm_P0[15:4] + 1'b1 : poly_mm_P0[15:4])};
+    //         2'b11: //round(12bit × 3329 >> 5)
+    //             poly_mm_result <= {12'b0, (poly_mm_P0[4] ? poly_mm_P0[16:5] + 1'b1 : poly_mm_P0[16:5])};
+    //       endcase
+    //       poly_mm_result_dummy <= mm_dummy;
+    //       poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
+    //     end
+    //     else begin
+    //         poly_mm_result <= poly_mm_result_temp;
+    //         // change start 
+    //         poly_mm_result_dummy <= mm_dummy;
+    //         poly_mm_result_dummy_d0 <= poly_mm_result_dummy;
+    //         // change end
+    //     end
+    // end
 
     // change start
-//    always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
-//        if(!poly_mm_rst_n) begin
-//            poly_mm_result_reg <= 48'h000000ffffff;
-//        end
-//    //     else if(decompose[0] == 1'b1)begin
-//    //         if(decompose == 2'b01) poly_mm_result_reg <= poly_mm_P0[30] ? poly_mm_P0[45:31] + 1'b1: poly_mm_P0[45:31] ;
-//    //         else                   poly_mm_result_reg <= poly_mm_P0[28] ? poly_mm_P0[45:29] + 1'b1 : poly_mm_P0[45:29] ;
-//    //     end
-//    //     else if(compress == 2'b01)begin //compress
-//    //       case(duv_mode) //2'b00:du=10 2'b01:du=11 2'b10:dv=4 2'b11:dv=5
-//    //         2'b00: //round(12bit * 22'd2580335 >> 23)
-//    //             poly_mm_result_reg <= {14'b0, (poly_mm_P0[22] ? poly_mm_P0[32:23] + 1'b1 : poly_mm_P0[32:23])};
-//    //         2'b01: //round(12bit * 22'd2580335 >> 22)
-//    //             poly_mm_result_reg <= {13'b0, (poly_mm_P0[21] ? poly_mm_P0[32:22] + 1'b1 : poly_mm_P0[32:22])};
-//    //         2'b10: //round(12bit * 22'd315 >> 16)
-//    //             poly_mm_result_reg <= {20'b0, (poly_mm_P0[15] ? poly_mm_P0[19:16] + 1'b1 : poly_mm_P0[19:16])};
-//    //         2'b11: //round(12bit * 22'd315 >> 15)
-//    //             poly_mm_result_reg <= {19'b0, (poly_mm_P0[14] ? poly_mm_P0[19:15] + 1'b1 : poly_mm_P0[19:15])};
-//    //       endcase
-//    //     end
-//    //     else if(compress == 2'b11)begin //decompress
-//    //       case(duv_mode) //00:du=10 01:du=11 10:dv=4 11:dv=5
-//    //         2'b00: //round(12bit × 3329 >> 10)
-//    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[9] ? poly_mm_P0[21:10] + 1'b1 : poly_mm_P0[21:10])};
-//    //         2'b01: //round(12bit × 3329 >> 11)
-//    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[10] ? poly_mm_P0[22:11] + 1'b1 : poly_mm_P0[22:11])};
-//    //         2'b10: //round(12bit × 3329 >> 4)
-//    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[3] ? poly_mm_P0[15:4] + 1'b1 : poly_mm_P0[15:4])};
-//    //         2'b11: //round(12bit × 3329 >> 5)
-//    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[4] ? poly_mm_P0[16:5] + 1'b1 : poly_mm_P0[16:5])};
-//    //       endcase
-//    //     end
-//        else begin
-//            poly_mm_result_reg <= {poly_mm_result_temp,mm_dummy};
-//        end
-//    end
+    always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
+        if(!poly_mm_rst_n) begin
+            poly_mm_result_reg <= 48'h000000ffffff;
+        end
+    //     else if(decompose[0] == 1'b1)begin
+    //         if(decompose == 2'b01) poly_mm_result_reg <= poly_mm_P0[30] ? poly_mm_P0[45:31] + 1'b1: poly_mm_P0[45:31] ;
+    //         else                   poly_mm_result_reg <= poly_mm_P0[28] ? poly_mm_P0[45:29] + 1'b1 : poly_mm_P0[45:29] ;
+    //     end
+    //     else if(compress == 2'b01)begin //compress
+    //       case(duv_mode) //2'b00:du=10 2'b01:du=11 2'b10:dv=4 2'b11:dv=5
+    //         2'b00: //round(12bit * 22'd2580335 >> 23)
+    //             poly_mm_result_reg <= {14'b0, (poly_mm_P0[22] ? poly_mm_P0[32:23] + 1'b1 : poly_mm_P0[32:23])};
+    //         2'b01: //round(12bit * 22'd2580335 >> 22)
+    //             poly_mm_result_reg <= {13'b0, (poly_mm_P0[21] ? poly_mm_P0[32:22] + 1'b1 : poly_mm_P0[32:22])};
+    //         2'b10: //round(12bit * 22'd315 >> 16)
+    //             poly_mm_result_reg <= {20'b0, (poly_mm_P0[15] ? poly_mm_P0[19:16] + 1'b1 : poly_mm_P0[19:16])};
+    //         2'b11: //round(12bit * 22'd315 >> 15)
+    //             poly_mm_result_reg <= {19'b0, (poly_mm_P0[14] ? poly_mm_P0[19:15] + 1'b1 : poly_mm_P0[19:15])};
+    //       endcase
+    //     end
+    //     else if(compress == 2'b11)begin //decompress
+    //       case(duv_mode) //00:du=10 01:du=11 10:dv=4 11:dv=5
+    //         2'b00: //round(12bit × 3329 >> 10)
+    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[9] ? poly_mm_P0[21:10] + 1'b1 : poly_mm_P0[21:10])};
+    //         2'b01: //round(12bit × 3329 >> 11)
+    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[10] ? poly_mm_P0[22:11] + 1'b1 : poly_mm_P0[22:11])};
+    //         2'b10: //round(12bit × 3329 >> 4)
+    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[3] ? poly_mm_P0[15:4] + 1'b1 : poly_mm_P0[15:4])};
+    //         2'b11: //round(12bit × 3329 >> 5)
+    //             poly_mm_result_reg <= {12'b0, (poly_mm_P0[4] ? poly_mm_P0[16:5] + 1'b1 : poly_mm_P0[16:5])};
+    //       endcase
+    //     end
+        else begin
+            poly_mm_result_reg <= {poly_mm_result_temp,mm_dummy};
+        end
+    end
     // change end
 
     // change start 
-//    assign mm_dummy = (poly_mm_result_reg[47:24]^poly_mm_result_reg[23:0])~^poly_mm_result_temp;
-//    assign poly_mm_result = poly_mm_result_reg[47:24];
+    assign mm_dummy = (poly_mm_result_reg[47:24]^poly_mm_result_reg[23:0])~^poly_mm_result_temp;
+    assign poly_mm_result = poly_mm_result_reg[47:24];
     // change end
 
     always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
@@ -426,19 +381,19 @@ module POLY_MM_Barret(
         end
     end
 
-//     always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin 
-//         if(!poly_mm_rst_n) begin
-//             lfsr_reg <= 16'hACE1;   // Random none-zero value
-//         end else if (poly_mm_enable) begin
-//             if (lfsr_reg == 24'h0000 || lfsr_reg[0] === 1'bx) begin
-//                 lfsr_reg <= 16'hACE1;
-//             end else begin
-//                 lfsr_reg <= {lfsr_reg[14:0], (lfsr_reg[15] ^ lfsr_reg[13] ^ lfsr_reg[10] ^ lfsr_reg[6])};
-//             end
-//         end else begin
-//             lfsr_reg <= lfsr_reg;
-//         end
-//     end
+    // always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin 
+    //     if(!poly_mm_rst_n) begin
+    //         lfsr_reg <= 16'hACE1;   // Random none-zero value
+    //     end else if (poly_mm_enable) begin
+    //         if (lfsr_reg == 24'h0000 || lfsr_reg[0] === 1'bx) begin
+    //             lfsr_reg <= 16'hACE1;
+    //         end else begin
+    //             lfsr_reg <= {lfsr_reg[14:0], (lfsr_reg[15] ^ lfsr_reg[13] ^ lfsr_reg[10] ^ lfsr_reg[6])};
+    //         end
+    //     end else begin
+    //         lfsr_reg <= lfsr_reg;
+    //     end
+    // end
 
     // always @(posedge poly_mm_clk) begin
     //     if(!poly_mm_rst_n) begin

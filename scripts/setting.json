@@ -5,7 +5,7 @@
         "SAMPLE_NUM":5000,
         "PLAINTEXT_NUM":2994,
         "TRACE_PROCESS_MODE":"align",
-        "DIR_TAG":"_hide_mm_merge_dummy_loop5",
+        "DIR_TAG":"_mask-lsfr",
         "REMARK":"-output-mm"
     },
     "PATH" : {
