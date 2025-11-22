@@ -137,7 +137,8 @@ def get_plaintexts(file_path,trace_number,plaintext_num=6):
      # 降采样参数
 class CPA:
     def __init__(self, power_trace_file, random_plaintext_file,
-                 sample_number=5000, traces_number=3329, key_number=3329,
+                 sample_number=5000, traces_number=3329, 
+                 guess_key_start = 0, guess_key_end = 3328,
                  process_number=None,
                  low_sample = None,
                  high_sample = None,
@@ -146,7 +147,9 @@ class CPA:
         self.power_trace_file = power_trace_file
         self.random_plaintext_file = random_plaintext_file
         self.sample_number = sample_number
-        self.key_number = key_number
+        #self.key_number = key_number
+        self.guess_keys = [key for key in range(guess_key_start,guess_key_end+1)]
+        self.key_number = len(self.guess_keys)
         self.traces_number = traces_number
         self.process_number = process_number or max(1, mp.cpu_count() - 1)
 
@@ -217,8 +220,10 @@ class CPA:
         """并行分析所有密钥"""
         print(f">>>>> 02 Starting parallel CPA analysis with {self.process_number} processes...")
         # 准备任务参数
+        # tasks = [(key, self.power_trace_mat, self.plaintext_list)
+        #          for key in range(self.key_number)]
         tasks = [(key, self.power_trace_mat, self.plaintext_list)
-                 for key in range(self.key_number)]
+                 for key in self.guess_keys]
         self.result = {}
         # 使用进程池并行处理
         with Pool(processes=self.process_number) as pool:
@@ -241,12 +246,15 @@ class CPA:
 
 class Draw:
     def __init__(self,picture_save_path,sample_number=5000,key_number=3329,
+                guess_key_start = 0, guess_key_end = 3328,
                 top_key_num = 5,
                 compare_window:Tuple[int,int]=(None,None),
                 ) -> None:
         self.save_path = picture_save_path
         self.sample_number = sample_number
-        self.key_number = key_number
+        self.guess_keys = [key for key in range(guess_key_start,guess_key_end+1)]
+        #self.key_number = key_number
+        self.key_number = len(self.guess_keys)
         self.top_key_num = top_key_num
         self.compare_window = compare_window
         
@@ -257,7 +265,7 @@ class Draw:
             left_cor,right_cor = self.compare_window[0],self.compare_window[1]
         print(f">> Compare range (max correlation) = ({left_cor},{right_cor})")
         max_cor = {}
-        for key in range(self.key_number):
+        for key in self.guess_keys:
             max_cor[key] = np.max(np.abs(result[key][0][left_cor:right_cor])) if abs else np.max(result[key][0][left_cor:right_cor])
         sorted_items = sorted(max_cor.items(), key=lambda x: x[1], reverse=True)
         # 获取前 n 个键
@@ -274,7 +282,7 @@ class Draw:
         save_path: 图像保存路径
         """
         print("📊 准备可视化结果...")
-        all_corrs = np.array([result[key].flatten() for key in range(self.key_number)])
+        all_corrs = np.array([result[key].flatten() for key in self.guess_keys])
         print('Data read finish')
         # 创建图形和坐标轴
         fig = plt.figure(figsize=(14, 8))
@@ -283,7 +291,7 @@ class Draw:
         max_key = index_max//self.sample_number
         max_index = index_max - (index_max//self.sample_number)*self.sample_number
         print(f'max r {np.max(np.abs(all_corrs))},arg {index_max},-> key:{max_key}, index:{max_index}')
-        key_max = index_max//self.sample_number
+        key_max = index_max//self.sample_number ## Need to modify use self.guess_keys
         if zoom_range:
             # 如果有缩放范围，创建两个子图：全局视图和放大视图
             ax1 = plt.subplot(2, 1, 1)  # 全局视图
@@ -320,10 +328,10 @@ class Draw:
             
             for ax in axes:
                 for i, key in enumerate(highlight_keys):
-                    
-                    corr = result[key].flatten()
-                    label = f'key {key}'
-                    ax.plot(corr, color=high_contrast_colors[i%10], linewidth=2, alpha=0.9, label=label)
+                    if key in self.guess_keys:
+                        corr = result[key].flatten()
+                        label = f'key {key}'
+                        ax.plot(corr, color=high_contrast_colors[i%10], linewidth=2, alpha=0.9, label=label)
                 corr_max = result[key_max].flatten()
                 if show_max:
                     label_max = f'key max {key_max}' 
@@ -368,12 +376,15 @@ class Draw:
 
         highlight_list = list(keys_to_plot_np)
         # Choose whether add special_b
-        if key_min <= special_b <= key_max and special_b not in highlight_list:
+        # if key_min <= special_b <= key_max and special_b not in highlight_list:
+        #     highlight_list.append(special_b)
+        if special_b in self.guess_keys and special_b not in highlight_list:
             highlight_list.append(special_b)
 
         # --- Draw Background --- #
         print("INFO: Plotting background correlation curves...")
-        for b_guess in range(key_min, key_max + 1):
+        # for b_guess in range(key_min, key_max + 1):
+        for b_guess in self.guess_keys:
             if b_guess in highlight_list:
                 continue    # skip
 
@@ -448,9 +459,11 @@ class Draw:
 
         plt.figure(figsize=(15, 8))
         # 定义绘图的x轴范围和y轴数据
-        max_corrs = [np.max(result[key][0]) for key in range(self.key_number)]
-        b_range_to_plot = np.arange(key_min, key_max + 1)
-        corrs_to_plot = max_corrs[key_min : key_max + 1]
+        max_corrs = {key:np.max(result[key][0]) for key in self.guess_keys} 
+        #b_range_to_plot = np.arange(key_min, key_max + 1)
+        b_range_to_plot = np.array(self.guess_keys)
+        # corrs_to_plot = max_corrs[key_min : key_max + 1]
+        corrs_to_plot = np.array([max_corrs[key] for key in self.guess_keys])
         plt.plot(b_range_to_plot, corrs_to_plot, alpha=0.6, label='All b_guess correlation')
         # plt.plot(range(N_guess), max_corrs, alpha=0.6, label='All b_guess correlation')
 
@@ -466,7 +479,7 @@ class Draw:
                          zorder=11)
 
         # 特殊标注 b_guess = special_b
-        if special_b not in keys_to_plot_np:
+        if special_b not in keys_to_plot_np and special_b in self.guess_keys:
             y_val = max_corrs[special_b]
             plt.plot(special_b, y_val, 'ro', markersize=8, zorder=10) # 'bo' = blue circle
             plt.annotate(f'({special_b}, {y_val:.4f})',

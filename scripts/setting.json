@@ -6,7 +6,7 @@
         "PLAINTEXT_NUM":2994,
         "TRACE_PROCESS_MODE":"align",
         "DIR_TAG":"_mask-lsfr",
-        "REMARK":"-output-mm"
+        "REMARK":"-test-new-cpa"
     },
     "PATH" : {
         "DATA_ROOT":"/15T/Projects/Dilithium-SCA/data/traces/",
@@ -14,7 +14,8 @@
         "RESULT_ROOT":"/15T/Projects/Dilithium-SCA/result/"
     },
     "CPA" : {
-        "KEY_NUM":3329,
+        "GUESS_KEY_START":1000,
+        "GUESS_KEY_END":2000,
         "LOW_SAMPLE":0,
         "HIGH_SAMPLE":5000,
         "DOWNSAMPLE_FACTOR":20,

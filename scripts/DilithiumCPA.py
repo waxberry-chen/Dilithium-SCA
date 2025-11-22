@@ -53,7 +53,11 @@ if not os.path.isfile(RANDOM_FILE):
 SAMPLE_NUM = general.get("SAMPLE_NUM")
 PLAINTEXT_NUM = general.get("PLAINTEXT_NUM")
 # PLAINTEXT_NUM = 3329
-KEY_NUM  = config_cpa.get("KEY_NUM")
+#KEY_NUM  = config_cpa.get("KEY_NUM")
+GUESS_KEY_START = config_cpa.get("GUESS_KEY_START")
+GUESS_KEY_END = config_cpa.get("GUESS_KEY_END")
+if GUESS_KEY_END < GUESS_KEY_START:
+    raise ValueError("Range of guess key error.")
 PROCESS_NUM = config_cpa.get("PROCESS_NUM")
 
 
@@ -71,7 +75,8 @@ cpa = CPA(
     random_plaintext_file=RANDOM_FILE,
     sample_number=SAMPLE_NUM,
     traces_number=PLAINTEXT_NUM,
-    key_number=KEY_NUM,
+    guess_key_start=GUESS_KEY_START,
+    guess_key_end= GUESS_KEY_END,
     process_number=PROCESS_NUM,
     low_sample= LOW_SAMPLE,
     high_sample=HIGH_SAMPLE
@@ -89,7 +94,8 @@ if __name__ == "__main__":
 
     draw = Draw(
         picture_save_path=PICTURE_PATH,
-        key_number=KEY_NUM,
+        guess_key_start=GUESS_KEY_START,
+        guess_key_end= GUESS_KEY_END,
         sample_number=cpa.sample_number
     )
     #print(result)
