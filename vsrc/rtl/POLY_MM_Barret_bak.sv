@@ -99,37 +99,30 @@ module POLY_MM_Barret(
     // ********** input blind add **********
 
     // result recovery
-    (* dont_touch = "true" *)(* keep = "TRUE" *) wire use_blinding_b;
+    (* dont_touch = "true" *)(* keep = "TRUE" *) wire use_blinding;
     (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] poly_mm_b_blinded;
-    (* dont_touch = "true" *)(* keep = "TRUE" *) reg [2:0] blind_history_b;
-    (* dont_touch = "true" *)(* keep = "TRUE" *) wire use_blinding_a;
-    (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] poly_mm_a_blinded;
-    (* dont_touch = "true" *)(* keep = "TRUE" *) reg [2:0] blind_history_a;
+    (* dont_touch = "true" *)(* keep = "TRUE" *) reg [2:0] blind_history;
     (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] final_result_candidate;
     (* dont_touch = "true" *)(* keep = "TRUE" *) wire [23:0] corrected_result;
 
-    assign use_blinding_b = (compress == 2'b00) && (decompose == 2'b00) && mask_lfsr_reg[0];
-    assign use_blinding_a = (compress == 2'b00) && (decompose == 2'b00) && mask_lfsr_reg[12];
+    assign use_blinding = (compress == 2'b00) && (decompose == 2'b00) && mask_lfsr_reg[0];
 
-    assign poly_mm_b_blinded = use_blinding_b ? (poly_mm_q - poly_mm_b) : poly_mm_b;
-    assign poly_mm_a_blinded = use_blinding_a ? (poly_mm_q - poly_mm_a) : poly_mm_a;
+    assign poly_mm_b_blinded = use_blinding ? (poly_mm_q - poly_mm_b) : poly_mm_b;
     
-    assign poly_mm_P0 = poly_mm_a_blinded * poly_mm_b_blinded;
+    assign poly_mm_P0 = poly_mm_a * poly_mm_b_blinded;
 
     // blind storage 3 cycles
     always @(posedge poly_mm_clk or negedge poly_mm_rst_n) begin
         if(!poly_mm_rst_n) begin
-            blind_history_b <= 3'b0;
-            blind_history_a <= 3'b0;
+            blind_history <= 3'b0;
         end else begin
-            blind_history_b <= {blind_history_b[1:0], use_blinding_b};
-            blind_history_a <= {blind_history_a[1:0], use_blinding_a};
+            blind_history <= {blind_history[1:0], use_blinding};
         end
     end
 
     assign final_result_candidate = poly_mm_result_temp;
 
-    assign corrected_result = ((blind_history_b[2]^blind_history_a[2]) && (final_result_candidate != 24'd0)) ? 
+    assign corrected_result = (blind_history[2] && (final_result_candidate != 24'd0)) ? 
                               (poly_mm_q - final_result_candidate) : 
                               final_result_candidate;
 

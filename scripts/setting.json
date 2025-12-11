@@ -1,12 +1,12 @@
 {
     "General" : {
-        "KEY_TRUE":1037,
-        "FILE_NUM":5,
+        "KEY_TRUE":251127,
+        "FILE_NUM":2,
         "SAMPLE_NUM":5000,
-        "PLAINTEXT_NUM":2994,
+        "PLAINTEXT_NUM":5000,
         "TRACE_PROCESS_MODE":"align",
-        "DIR_TAG":"_mask-lsfr",
-        "REMARK":"-test-new-cpa"
+        "DIR_TAG":"_tvla_5000_prot",
+        "REMARK":"-prot"
     },
     "PATH" : {
         "DATA_ROOT":"/15T/Projects/Dilithium-SCA/data/traces/",
@@ -14,13 +14,13 @@
         "RESULT_ROOT":"/15T/Projects/Dilithium-SCA/result/"
     },
     "CPA" : {
-        "GUESS_KEY_START":1000,
-        "GUESS_KEY_END":2000,
+        "GUESS_KEY_START":250000,
+        "GUESS_KEY_END":260000,
         "LOW_SAMPLE":0,
         "HIGH_SAMPLE":5000,
         "DOWNSAMPLE_FACTOR":20,
         "PROCESS_NUM":32,
-        "RANDOM_FILE_NAME": "random_3000_0-3328.txt"
+        "RANDOM_FILE_NAME": "Random_5006_dil.txt"
     },
     "PROCESS" : {
         "SOURCE_FILE_PREFIX_NAME":"mau_traces-loop",
@@ -30,5 +30,10 @@
         "ALIGN_MAX_SHIFT":7,
         "DOWN_IN_PROCESS":"False",
         "DOWN_FACTOR":1
+    },
+    "TVLA" : {
+        "USE_TRACE_NUM" : 500,
+        "SHOW_START" : 2000,
+        "SHOW_END" : 5000
     }
 }

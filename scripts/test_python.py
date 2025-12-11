@@ -204,29 +204,29 @@ if __name__ == "__main__":
     #     print(f'a:{a},b:{test_b}, cal:{p1},cal with out xor:{p2},cal with xor:{p3}')
 
     ############# test regs transfer
-    file_random = '/15T/Projects/Dilithium-SCA/data/special_files/random_3000_0-3328.txt'
-    save_path = "/15T/Projects/Dilithium-SCA/result/test/"
-    key = 1037
-    d0_list,d1_list,d2_list,all_list = [],[],[],[]
-    mm_list = []
-    number = 2994
-    for i in range(number):
-        plaitexts = get_plaintexts(file_path=file_random,trace_number=i)
-        p0_d0,p0_d1,p0_d2 = regs_transfer_count(plaintexts=plaitexts,key=key)
-        d0_list.append(p0_d0)
-        d1_list.append(p0_d1)
-        d2_list.append(p0_d2)
-        all_list.append(p0_d0+p0_d1+p0_d2)
-        mm = distance(plaintexts=plaitexts,key=key)
-        mm_list.append(mm)
-    rall = np.corrcoef(np.array(mm_list),np.array(all_list))[0,1]
-    print(f"mm/all: {rall}")
-    rd0 = np.corrcoef(np.array(mm_list),np.array(d0_list))[0,1]
-    print(f"mm/d0: {rd0}")
-    rd1 = np.corrcoef(np.array(mm_list),np.array(d1_list))[0,1]
-    print(f"mm/d1: {rd1}")
-    rd2 = np.corrcoef(np.array(mm_list),np.array(d2_list))[0,1]
-    print(f"mm/d2: {rd2}")
+    # file_random = '/15T/Projects/Dilithium-SCA/data/special_files/random_3000_0-3328.txt'
+    # save_path = "/15T/Projects/Dilithium-SCA/result/test/"
+    # key = 1037
+    # d0_list,d1_list,d2_list,all_list = [],[],[],[]
+    # mm_list = []
+    # number = 2994
+    # for i in range(number):
+    #     plaitexts = get_plaintexts(file_path=file_random,trace_number=i)
+    #     p0_d0,p0_d1,p0_d2 = regs_transfer_count(plaintexts=plaitexts,key=key)
+    #     d0_list.append(p0_d0)
+    #     d1_list.append(p0_d1)
+    #     d2_list.append(p0_d2)
+    #     all_list.append(p0_d0+p0_d1+p0_d2)
+    #     mm = distance(plaintexts=plaitexts,key=key)
+    #     mm_list.append(mm)
+    # rall = np.corrcoef(np.array(mm_list),np.array(all_list))[0,1]
+    # print(f"mm/all: {rall}")
+    # rd0 = np.corrcoef(np.array(mm_list),np.array(d0_list))[0,1]
+    # print(f"mm/d0: {rd0}")
+    # rd1 = np.corrcoef(np.array(mm_list),np.array(d1_list))[0,1]
+    # print(f"mm/d1: {rd1}")
+    # rd2 = np.corrcoef(np.array(mm_list),np.array(d2_list))[0,1]
+    # print(f"mm/d2: {rd2}")
     # x = [i for i in range(number)]
     # plt.figure(0)
     # plt.plot(x,mm_list,label="mm")
@@ -236,5 +236,16 @@ if __name__ == "__main__":
     # plt.plot(x,all_list,label="d0+d1+d2")
     # plt.legend()
     # plt.savefig(save_path+'regs_transfer.png')
-
+    # import random
+    # for i in range(10):
+    #     a = random.randint(0,1000)
+    #     b = random.randint(0,1000)
+    #     a_mask = random.randint(0,1000)
+    #     left = (a^a_mask)*(b^a_mask)
+    #     right = (a*b)^(b*a_mask)^(a*a_mask)^(a_mask*a_mask)
+    #     print(f"left:{left},right:{right}")
+    # a = [[1,2,3],[1,2,3]]
+    # npa = np.array(a)
+    # print(npa.shape[1])
+    help(np.reshape)
   

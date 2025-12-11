@@ -61,8 +61,8 @@ module POLY_ALU(
 
 
     // ***** add *****
-    wire [23:0] poly_mm_dout1, poly_mm_dout2;
-    assign poly_mm_dout = poly_mm_dout1 ^ poly_mm_dout2;
+    // wire [23:0] poly_mm_dout1, poly_mm_dout2;
+    // assign poly_mm_dout = poly_mm_dout1 ^ poly_mm_dout2;
 
     POLY_MM_Barret u_POLY_MM_Barret(
         .poly_mm_clk    ( poly_clk    ),
@@ -77,9 +77,9 @@ module POLY_ALU(
         .poly_mm_q      ( poly_q      ),
         .poly_mm_N      ( poly_mm_N      ),
         .poly_mm_valid  ( poly_mm_valid  ),
-        //.poly_mm_result  ( poly_mm_dout  )
-        .poly_mm_result_share1  ( poly_mm_dout1  ),
-        .poly_mm_result_share2  ( poly_mm_dout2  )
+        .poly_mm_result  ( poly_mm_dout  )
+        // .poly_mm_result_share1  ( poly_mm_dout1  ),
+        // .poly_mm_result_share2  ( poly_mm_dout2  )
     );
 
 //     // ***** dummy barret *****

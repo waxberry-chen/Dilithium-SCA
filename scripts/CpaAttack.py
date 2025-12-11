@@ -62,7 +62,7 @@ def column_pearson_corr(matrix1, matrix2):
 ### get distance in cycle 7
 
 a_last = 0
-qNUM = 3329
+qNUM = 8380417
 
 ########################################
 #     Get Prediction Vector Method     #
@@ -86,7 +86,7 @@ def distance(plaintexts,key):
 
     a_last = plaintexts[4]
     # return output + mm_result
-    return output + mm_result
+    return  mm_result+output
 
     # ##### Verify #####
     # wn = 1729

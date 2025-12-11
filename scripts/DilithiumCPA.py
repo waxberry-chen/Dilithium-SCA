@@ -87,13 +87,14 @@ if __name__ == "__main__":
     timestamp = datetime.now().strftime("%Y%m%d_%H:%M")
     
     time_tag = timestamp+'-'+str(special_b)+DIR_TAG+'-'+TRACE_PROCESS_MODE+remark
+    picture_save_path = os.path.join(PICTURE_PATH,'cpa/')
     
     cpa.read_power(down_sample_factor = DOWNSAMPLE_FACTOR )
 
     result = cpa.analyze()
 
     draw = Draw(
-        picture_save_path=PICTURE_PATH,
+        picture_save_path=picture_save_path,
         guess_key_start=GUESS_KEY_START,
         guess_key_end= GUESS_KEY_END,
         sample_number=cpa.sample_number
