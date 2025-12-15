@@ -247,5 +247,6 @@ if __name__ == "__main__":
     # a = [[1,2,3],[1,2,3]]
     # npa = np.array(a)
     # print(npa.shape[1])
-    help(np.reshape)
+    # help(np.reshape)
+    print(list(range(0,0)))
   

@@ -342,7 +342,7 @@ class TraceProcess:
         down_flag = down 
         for plaintext in range(self.plaintext_number):
             if plaintext > 0 and plaintext % 250 == 0:
-                print(f"正在处理 a = {plaintext}/{self.plaintext_number-1}...")
+                print(f"\r正在处理 a = {plaintext}/{self.plaintext_number-1}...",end="")
             
             traces_for_current_a = np.zeros((self.power_file_num, self.sample_number))
             for file_idx in range(self.power_file_num):
@@ -360,7 +360,7 @@ class TraceProcess:
             # --- 如果是指定的a值，则生成可视化图表 ---
             if GENERATE_VISUALIZATIONS and plaintext == A_VAL_TO_VISUALIZE:
                 visualize_preprocessing(traces_for_current_a, aligned_batch, down_trace, plaintext, save_path)
-        print(f">>> Save processed file to {save_path}")
+        print(f"\n>>> Save processed file to {save_path}")
         
         with tq(total=self.plaintext_number, desc=f"Writing Power file:{save_file_name}") as read_bar:
             with open(os.path.join(save_path, save_file_name),'w') as wf:

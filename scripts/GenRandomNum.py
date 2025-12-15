@@ -10,10 +10,11 @@ def gen_random(file,number,num_arange=8380417,num_start=1):
         unique_randoms = random.sample(range(num_start, num_arange), k=number)
         #unique_randoms = range(3329+6)
         for index,num in enumerate(unique_randoms):
-            if index %2 == 0:
-                of.write(str(num)+'\n')
-            else :
-                of.write(str(251210)+'\n')
+            of.write(str(num)+'\n')
+            # if index %2 == 0:
+            #     of.write(str(num)+'\n')
+            # else :
+            #     of.write(str(251210)+'\n')
     print(f"--->Gen {number} num in [{num_start},{num_arange-1}], Saved in file: {file}")
 
 # def gen_power_test(file,number,num_arange=8380417,num_start=1):
@@ -32,8 +33,8 @@ def gen_random(file,number,num_arange=8380417,num_start=1):
 #     print(f"--->Gen {number} num in [{num_start},{num_arange-1}], Saved in file: {file}")
 
 if __name__ == "__main__":
-    number = 5006
-    file_name = f'Random_{number}_tvla.txt'
+    number = 50006
+    file_name = f'Random_{number}_dil.txt'
     file = file_root_path + file_name
     gen_random(file=file, number=number)
     # file_name = f'power_test_{number}.txt'

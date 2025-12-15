@@ -36,7 +36,7 @@ remark = general.get("REMARK")
 
 #RANDOM_FILE = "/15T/Projects/Dilithium-SCA/data/special_files/Random_3000.txt"
 RANDOM_ROOT = path.get("SPECIAL_ROOT")
-RANDOM_NAME = config_cpa.get("RANDOM_FILE_NAME")
+RANDOM_NAME = general.get("RANDOM_FILE_NAME")
 RANDOM_FILE = os.path.join(RANDOM_ROOT,RANDOM_NAME)
 
 PICTURE_PATH = path.get("RESULT_ROOT")
