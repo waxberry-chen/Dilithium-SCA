@@ -18,7 +18,25 @@ from DistanceModule import distance,get_plaintexts
 from CpaAttack import column_pearson_corr
 
 
+
 matplotlib.use('Agg')
+
+plt.rcParams.update({
+    'font.size': 15,                   # 默认字体大小
+    'font.family': 'sans-serif',       # 字体系列
+    'font.sans-serif': ['Times New Roman','DejaVu Sans', 'Arial'],  # 无衬线字体优先级
+    'font.serif': ['Times New Roman'], # 衬线字体
+    'font.monospace': ['Courier New'], # 等宽字体
+    'font.weight': 'normal',           # 字体粗细
+    'axes.titlesize': 16,              # 坐标轴标题大小
+    'axes.labelsize': 15,              # 坐标轴标签大小
+    'xtick.labelsize': 13,             # x轴刻度标签大小
+    'ytick.labelsize': 13,             # y轴刻度标签大小
+    'legend.fontsize': 15,             # 图例字体大小
+    'figure.titlesize': 18,            # 图形标题大小
+    'figure.labelsize': 15             # 图形标签大小
+})
+
 # import json file
 try:
     with open("setting.json") as setf:
@@ -166,7 +184,7 @@ def merge_partial_results(results_dir, output_file, total_keys):
     all_results = {}
     processed_keys = set()
     processed_num = 0
-    total_num = len(total_keys)
+    total_num = total_keys
     for filename in os.listdir(results_dir):
         if filename.startswith('partial_'):
             filepath = os.path.join(results_dir, filename)
@@ -179,11 +197,11 @@ def merge_partial_results(results_dir, output_file, total_keys):
                         processed_keys.add(key)
                         processed_num += 1
                         if processed_num % 100 == 0:
-                            print(f"\r processed:{processed_num}/{total_num}")
+                            print(f"\r processed:{processed_num}/{total_num}",end='')
     
     # 检查是否所有密钥都已处理
     if len(all_results) < total_keys:
-        print(f">>> 警告: 只有 {len(all_results)}/{total_keys} 个密钥被处理")
+        print(f"\n>>> 警告: 只有 {len(all_results)}/{total_keys} 个密钥被处理")
     
     # 按密钥排序并写入最终结果
     with open(output_file, 'w') as f:
@@ -191,7 +209,7 @@ def merge_partial_results(results_dir, output_file, total_keys):
             corr_str = ",".join(f"{c:.4f}" for c in all_results[key])
             f.write(f"{key}:{corr_str}\n")
     
-    print(f">>> 写入最终结果: {len(all_results)} 个密钥")
+    print(f"\n>>> 写入最终结果: {len(all_results)} 个密钥")
 
 class GetCpaTraceNum:
     def __init__(self, 
@@ -407,7 +425,14 @@ class GetCpaTraceNum:
         print(f">>> 分析完成! 结果保存至: {output_file}")
         print(f">>> 总耗时: {time.time()-start_time:.2f}秒")
     
-    def show_traces(self,picture_tag='',highlight_keys=None,start_plaintext_number=3,stop_plaintext_number=3329,save_picture=True,y_window = (0,0.5)):
+    def show_traces(self,
+                    picture_tag='',
+                    highlight_keys=None,
+                    start_plaintext_number=3,
+                    stop_plaintext_number=3329,
+                    save_picture=True,
+                    y_window = (0,0.5),
+                    x_step = 20):
         result_file = self.result_file
         if not os.path.isfile(result_file):
             raise ValueError(f'Need correlations result file: {result_file}.')
@@ -465,7 +490,7 @@ class GetCpaTraceNum:
 
         # 绘制所有密钥的相关系数曲线 (高性能方式)
         # 使用透明浅色绘制所有曲线
-        x = np.arange(start_plaintext_number,stop_plaintext_number)
+        x = np.arange(start_plaintext_number,stop_plaintext_number)*x_step
         print(">>> Start to draw traces")
         for i in range(0,len(all_corrs),100):
             end = min(len(all_corrs)-1,i+100)
@@ -477,7 +502,7 @@ class GetCpaTraceNum:
             print(f"\r drawing:{i}/{len(all_corrs)}",end='')
 
         # 设置坐标轴范围
-        ax.set_xlim(start_plaintext_number, stop_plaintext_number)
+        ax.set_xlim(start_plaintext_number*x_step, stop_plaintext_number*x_step)
         ax.set_ylim(y_window[0], y_window[1])  # 相关系数范围
         #ax.set_ylim(-0.5, 0.35)  # 相关系数范围
 
@@ -494,16 +519,18 @@ class GetCpaTraceNum:
             print(f"highlight key: {highlight_keys}")
             #colors = plt.cm.tab10(np.linspace(0, 1, len(highlight_keys)))
             for i, key in enumerate(highlight_keys):
-                corrs = corr_curves[key].flatten()
+                corrs = corr_curves[key][start_plaintext_number:stop_plaintext_number].flatten()
                 label = f'key {key}'
-                ax.plot(corrs, color=high_contrast_colors[i%10], linewidth=1, alpha=0.9, label=label)
+                ax.plot(x,corrs, color=high_contrast_colors[i%10], linewidth=1, alpha=0.9, label=label)
             # 添加图例
             ax.legend(loc='upper right')
 
         # 添加标题
-        title = f'CPA result per Trace number ({self.key_start}-{self.key_end},total {self.key_number} keys)'
-        if highlight_keys:
-            title += f'\nhighlight key(s): {", ".join(map(str, highlight_keys))}'
+        #title = f'CPA result per Trace number ({self.key_start}-{self.key_end},total {self.key_number} keys)'
+        #title = f'CPA result per Trace number '
+        title = f'Correlation-Trace number '
+        # if highlight_keys:
+        #     title += f'\nhighlight key(s): {", ".join(map(str, highlight_keys))}'
         plt.suptitle(title, fontsize=14)
         plt.tight_layout()
         picture_file = os.path.join(

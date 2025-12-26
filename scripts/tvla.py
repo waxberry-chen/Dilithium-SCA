@@ -9,6 +9,22 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 matplotlib.use('Agg')
+plt.rcParams.update({
+    'font.size': 15,                   # 默认字体大小
+    'font.family': 'sans-serif',       # 字体系列
+    'font.sans-serif': ['DejaVu Sans', 'Arial'],  # 无衬线字体优先级
+    'font.serif': ['Times New Roman'], # 衬线字体
+    'font.monospace': ['Courier New'], # 等宽字体
+    'font.weight': 'normal',           # 字体粗细
+    'axes.titlesize': 16,              # 坐标轴标题大小
+    'axes.labelsize': 15,              # 坐标轴标签大小
+    'xtick.labelsize': 13,             # x轴刻度标签大小
+    'ytick.labelsize': 13,             # y轴刻度标签大小
+    'legend.fontsize': 15,             # 图例字体大小
+    'figure.titlesize': 18,            # 图形标题大小
+    'figure.labelsize': 15             # 图形标签大小
+})
+
 # import json file
 try:
     with open("setting.json") as setf:
@@ -116,13 +132,21 @@ class TVLA:
         return t,mva,mvb
 
 
-    def save_curves(self,t,mva,mvb,save_path,time_tag='',th_num=4.5,show_window:Tuple =(None,None)):
+    def save_curves(self,
+                    t,
+                    mva,
+                    mvb,
+                    save_path,
+                    time_tag='',
+                    th_num=4.5,
+                    show_window:Tuple =(None,None)
+                    ):
         if show_window[0] and show_window[1]:
             t = t[0][show_window[0]:show_window[1]]
         else :
             t = t[0]
 
-        x = np.array([i for i in range(t.shape[0])])
+        x = np.array([i+show_window[0] for i in range(t.shape[0])])
         th_up = np.array([th_num for _ in range(t.shape[0])])
         th_down = np.array([-th_num for _ in range(t.shape[0])])
         style_kwargs_up = {'color': '#FF4500', 'zorder': 50, 'linewidth': 0.8, 'label': f'threshold={th_num}'}
@@ -134,9 +158,11 @@ class TVLA:
         plt.plot(x,th_down,**style_kwargs_down)
         plt.plot(x,t,**style_kwargs_t)
         
-        plt.title('TVLA test statistics')
-        plt.xlabel('Time')
+        plt.title('TVLA Test Statistics')
+        plt.xlabel('Sample Number')
+        plt.xlim(x[0],x[-1])
         plt.ylabel('t')
+        plt.ylim(-12,12)
         plt.legend()
         plt.grid(True)
         plt.axhline(0, color='black', linewidth=0.5)

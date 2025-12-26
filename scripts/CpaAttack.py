@@ -13,6 +13,22 @@ from DistanceModule import distance , get_plaintexts
 
 matplotlib.use('Agg')
 
+plt.rcParams.update({
+    'font.size': 15,                   # 默认字体大小
+    'font.family': 'sans-serif',       # 字体系列
+    'font.sans-serif': ['DejaVu Sans', 'Arial'],  # 无衬线字体优先级
+    'font.serif': ['Times New Roman'], # 衬线字体
+    'font.monospace': ['Courier New'], # 等宽字体
+    'font.weight': 'normal',           # 字体粗细
+    'axes.titlesize': 16,              # 坐标轴标题大小
+    'axes.labelsize': 15,              # 坐标轴标签大小
+    'xtick.labelsize': 13,             # x轴刻度标签大小
+    'ytick.labelsize': 13,             # y轴刻度标签大小
+    'legend.fontsize': 15,             # 图例字体大小
+    'figure.titlesize': 18,            # 图形标题大小
+    'figure.labelsize': 15             # 图形标签大小
+})
+
 high_contrast_colors = [   
             '#FFD700',  # 金黄色
             '#FF6347',  # 番茄红
@@ -357,7 +373,19 @@ class Draw:
         else:
             plt.show()
 
-    def draw_fig1(self,result,keys_to_plot_np,time_tag,special_b=2773,key_min=0,key_max=3328,roi_start=None,roi_en=None):
+    def draw_fig1(self,
+                  result,
+                  keys_to_plot_np,
+                  time_tag,
+                  special_b=2773,
+                  key_min=0,
+                  key_max=3328,
+                  roi_start=None,
+                  roi_en=None,
+                  down_factor=20,
+                  y_window=(-0.25,0.25),
+                  only_show_true=True
+                  ):
         """
         绘制所有猜测密钥的相关系数随时间变化的图，并高亮显示特定密钥。
         """
@@ -384,7 +412,7 @@ class Draw:
             if(b_guess - key_min) % 200 == 0:
                 print(f"\r>>> Plotting background curve: {b_guess}/{key_max}",end="")
 
-            corrs, valid_indices = result[b_guess][0],[i for i in range(self.sample_number)]
+            corrs, valid_indices = result[b_guess][0],[i*down_factor for i in range(self.sample_number)]
             if corrs is not None and len(valid_indices) > 0:
                 # Use grey slim transparent line to draw background
                 # print(f">>> {len(valid_indices)}")
@@ -395,8 +423,8 @@ class Draw:
 
         colors = plt.cm.viridis(np.linspace(0, 1, len(highlight_list))) # 为5条曲线选择不同颜色
         for i, b_guess in enumerate(highlight_list):
-            corrs, valid_indices = result[b_guess][0],[i for i in range(self.sample_number)]
-            if corrs is not None:
+            corrs, valid_indices = result[b_guess][0],[i*down_factor for i in range(self.sample_number)]
+            if corrs is not None and b_guess == special_b:#only show special b
                 # 特殊处理 b_guess = special_b 的样式
                 if b_guess == special_b:
                     style_kwargs = {'color': 'red', 'linestyle': '--', 'zorder': 100, 'linewidth': 1, 'label': f'special_b = {b_guess}'}
@@ -415,7 +443,7 @@ class Draw:
                     indices_for_peak = valid_indices[mask]
                     corrs_for_peak = corrs[mask]
 
-                if corrs_for_peak.size > 0:
+                if corrs_for_peak.size > 0 :
 
                     peak_idx_in_corrs = np.argmax(corrs_for_peak)
                     x_peak = indices_for_peak[peak_idx_in_corrs]
@@ -427,15 +455,16 @@ class Draw:
                                  arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=4),
                                  zorder=101)
 
-        plt.title('Pearson Coefficient vs. Time')
-        plt.xlabel('Time')
+        plt.title('Pearson Coefficient - Sample Number')
+        plt.xlabel('Sample Number')
         plt.ylabel('Correlation Coefficient (rho)')
         plt.legend()
         plt.grid(True)
         plt.axhline(0, color='black', linewidth=0.5)
 
         # 设置纵轴范围 (可根据需要调整)
-        plt.ylim(-0.2, 0.2)  # 例如：设置纵轴范围为 -0.5 到 0.5
+        plt.ylim(y_window[0], y_window[1])  # 例如：设置纵轴范围为 -0.5 到 0.5
+        plt.xlim(valid_indices[0],valid_indices[-1])
         time_path = os.path.join(self.save_path,time_tag+'/')
         os.makedirs(time_path,exist_ok=True)
         fig1_path = os.path.join(self.save_path,time_tag+'/', 'fig1_corrs_over_time.png')
@@ -443,7 +472,12 @@ class Draw:
         print(f"[+] 图1已保存至: {fig1_path}")
         plt.close()
     
-    def draw_fig2(self,result,keys_to_plot_np,time_tag,special_b=2773,key_min=0,key_max=3328,roi_start=None,roi_en=None):
+    def draw_fig2(self,
+                result,
+                keys_to_plot_np,
+                time_tag,
+                special_b=2773
+                ):
         """
         绘制每个猜测密钥的最大相关系数图。
         """
@@ -463,29 +497,39 @@ class Draw:
         # 标注Top 5的点
         for b_guess in keys_to_plot_np:
             y_val = max_corrs[b_guess]
-            plt.plot(b_guess, y_val, 'bo', markersize=8, zorder=10) # 'ro' = red circle
-            plt.annotate(f'({b_guess}, {y_val:.4f})',
-                         xy=(b_guess, y_val),
-                         xytext=(b_guess, y_val + 0.01),
-                         ha='center',
-                         fontsize=9,
-                         zorder=11)
+            if b_guess == special_b:
+                plt.plot(special_b, y_val, 'ro', markersize=8, zorder=10)
+                plt.annotate(f'({b_guess}, {y_val:.3f})',
+                             xy=(b_guess, y_val),
+                             xytext=(b_guess, y_val),
+                             ha='center',
+                             fontsize=11,
+                             zorder=11)
+            else:
+                plt.plot(b_guess, y_val, 'bo', markersize=8, zorder=10) # 'ro' = red circle
+
+            # plt.annotate(f'({b_guess}, {y_val:.4f})',
+            #              xy=(b_guess, y_val),
+            #              xytext=(b_guess, y_val + 0.01),
+            #              ha='center',
+            #              fontsize=9,
+            #              zorder=11)
 
         # 特殊标注 b_guess = special_b
         if special_b not in keys_to_plot_np and special_b in self.guess_keys:
             y_val = max_corrs[special_b]
             plt.plot(special_b, y_val, 'ro', markersize=8, zorder=10) # 'bo' = blue circle
-            plt.annotate(f'({special_b}, {y_val:.4f})',
+            plt.annotate(f'({special_b}, {y_val:.3f})',
                          xy=(special_b, y_val),
-                         xytext=(special_b, y_val + 0.01),
+                         xytext=(special_b, y_val),
                          ha='center',
-                         color='blue',
-                         fontsize=9,
+                         fontsize=11,
                          zorder=11)
 
 
-        plt.title('Every guess of \'b\'\'s maximum correlation coefficient')
-        plt.xlabel('\'b\'\'s guess value')
+        plt.title('Every guess of b\'s maximum correlation coefficient')
+        plt.xlabel('b\'s guess value')
+        plt.xlim(b_range_to_plot[0],b_range_to_plot[-1])
         plt.ylabel('Maximum absolute correlation coefficient')
         plt.legend([plt.Line2D([0], [0], color='w')], [f'Found key: b={keys_to_plot_np[0]}']) # 简化图例
         plt.grid(True)
